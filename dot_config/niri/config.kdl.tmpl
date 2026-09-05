@@ -183,7 +183,7 @@ recent-windows {
     }
 }
 
-include "./hosts/desktop.kdl"
+include "./hosts/{{- .chezmoi.hostname -}}.kdl"
 
 // Include dms files
 include optional=true "dms/colors.kdl"
