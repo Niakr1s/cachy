@@ -1,0 +1,29 @@
+[[mgr.prepend_keymap]]
+on = [ "q" ]
+run = "quit --no-cwd-file"
+desc = "Quit Yazi without changing directory"
+
+[[mgr.prepend_keymap]]
+on = [ "Q" ]
+run = "quit"
+desc = "Quit Yazi and change directory in shell"
+
+[[mgr.prepend_keymap]]
+on = "i"
+run = 'shell "$EDITOR %s" --block'
+desc = "Edit in Neovim"
+
+[[mgr.prepend_keymap]]
+on = "I"
+run = 'shell "sudo -e %s" --block'
+desc = "Edit in Neovim with sudo"
+
+[[mgr.prepend_keymap]]
+on   = [ "T" ]
+run  = "plugin toggle-pane max-preview"
+desc = "Maximize or restore the preview pane"
+
+[[mgr.prepend_keymap]]
+on   = [ "M" ]
+run  = "plugin mediainfo -- toggle-metadata"
+desc = "Toggle media preview metadata"

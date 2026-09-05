@@ -1,0 +1,10 @@
+spawn-sh-at-startup "sleep 2 && lisgd -v -d /dev/input/by-path/pci-0000:00:17.0-platform-i2c_designware.4-event -g \"1,LR,L,*,R,niri msg action focus-column-left\" -g \"1,RL,R,*,R,niri msg action focus-column-right\" -g \"1,DU,B,*,R,niri msg action open-overview\" -g \"2,UD,T,*,R,niri msg action close-window\" -g \"1,UD,T,*,R,niri msg action open-overview\" -g \"2,DU,B,*,R,niri msg action close-window\" -g \"2,LR,L,*,R,niri msg action maximize-column\" -g \"2,RL,R,*,R,niri msg action maximize-column\""
+
+spawn-sh-at-startup "$HOME/.cargo/bin/iio-niri listen"
+
+spawn-sh-at-startup "wvkbd-mobintl -L 256 -l full,cyrillic --landscape-layers full,cyrillic --hidden"
+
+// TODO: changte to dms
+switch-events {
+    // lid-close { spawn "noctalia-shell" "ipc" "call" "sessionMenu" "lockAndSuspend"; }
+}

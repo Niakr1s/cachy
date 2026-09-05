@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "configurations": [
+    {
+      "id": "auto_19df2d74",
+      "name": "",
+      "outputs": {
+        "Xiaomi Corporation Mi Monitor 2920000136510": {
+          "mode": "1920x1080@75.002",
+          "position": {
+            "x": 2576,
+            "y": 365
+          },
+          "scale": 1,
+          "transform": "Normal",
+          "vrr": false,
+          "disabled": false,
+          "niri": {
+            "focusAtStartup": false
+          }
+        },
+        "GIGA-BYTE TECHNOLOGY CO., LTD. M32QC 24390B004015": {
+          "mode": "2560x1440@165.001",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "scale": 1,
+          "transform": "Normal",
+          "vrr": false,
+          "disabled": false,
+          "niri": {
+            "focusAtStartup": true
+          }
+        }
+      }
+    },
+    {
+      "id": "profile_1787766906921_3v94udd",
+      "name": "2",
+      "outputs": {
+        "DP-4": {
+          "mode": "2560x1440@165.001",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "scale": 1,
+          "transform": "Normal",
+          "vrr": false,
+          "disabled": false,
+          "niri": {}
+        },
+        "HDMI-A-3": {
+          "mode": "1920x1080@75.002",
+          "position": {
+            "x": 2581,
+            "y": 280
+          },
+          "scale": 1,
+          "transform": "Normal",
+          "vrr": false,
+          "disabled": false,
+          "niri": {}
+        }
+      }
+    },
+    {
+      "id": "profile_1787766927200_llfv02g",
+      "name": "1",
+      "outputs": {
+        "Xiaomi Corporation Mi Monitor 2920000136510": {
+          "mode": null,
+          "position": {
+            "x": 2576,
+            "y": 365
+          },
+          "scale": 1,
+          "transform": "Normal",
+          "vrr": false,
+          "disabled": true,
+          "niri": {
+            "focusAtStartup": false
+          }
+        },
+        "GIGA-BYTE TECHNOLOGY CO., LTD. M32QC 24390B004015": {
+          "mode": "2560x1440@165.001",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "scale": 1,
+          "transform": "Normal",
+          "vrr": false,
+          "disabled": false,
+          "niri": {
+            "focusAtStartup": true
+          }
+        }
+      }
+    }
+  ]
+}

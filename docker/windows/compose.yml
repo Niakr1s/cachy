@@ -1,0 +1,30 @@
+name: windows
+
+services:
+  windows:
+    image: ghcr.io/dockur/windows:5.14
+    container_name: windows
+    environment:
+      RAM_SIZE: 6G
+      CPU_CORES: "8"
+      DISK_SIZE: 32G
+      USERNAME: bill
+      PASSWORD: gates
+      LANGUAGE: English
+    devices:
+      - /dev/kvm
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    ports:
+      - 8006:8006
+      - 3389:3389/tcp
+      - 3389:3389/udp
+    volumes:
+      - $ISO:/custom.iso:z
+      - ./storage:/storage:Z
+      - ./shared:/shared:Z
+      - $SHARED2:/shared2:Z
+    restart: on-failure
+    stop_grace_period: 2m

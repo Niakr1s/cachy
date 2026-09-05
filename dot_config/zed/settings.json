@@ -1,0 +1,47 @@
+{
+  "disable_ai": true,
+  "show_signature_help_after_edits": true,
+  "auto_signature_help": true,
+  "icon_theme": "Zed (Default)",
+  "cli_default_open_behavior": "existing_window",
+  "load_direnv": "shell_hook",
+  "terminal": {
+    "alternate_scroll": "off",
+    "blinking": "off",
+    "copy_on_select": false,
+    "dock": "bottom",
+    "detect_venv": {
+      "on": {
+        "directories": [".env", "env", ".venv", "venv"],
+        "activate_script": "default",
+      },
+    },
+    "env": {},
+    "line_height": "comfortable",
+    "option_as_meta": false,
+    "button": false,
+    "shell": "system",
+    "working_directory": "current_project_directory",
+  },
+  "show_edit_predictions": false,
+  "colorize_brackets": true,
+  "gutter": { "line_numbers": true },
+  "vim_mode": true,
+  "buffer_font_family": ".ZedMono",
+  "buffer_font_features": {
+    "calt": false,
+  },
+  "auto_update": false,
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false,
+  },
+  "session": { "trust_all_worktrees": true },
+  "ui_font_size": 16.0,
+  "buffer_font_size": 14.0,
+  "theme": {
+    "mode": "system",
+    "light": "Ayu Mirage",
+    "dark": "Ayu Dark",
+  },
+}

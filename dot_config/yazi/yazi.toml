@@ -1,0 +1,39 @@
+[mgr]
+ratio = [1, 4, 3]
+sort_by = "natural"
+sort_sensitive = true
+sort_reverse = false
+sort_dir_first = true
+linemode = "none"
+show_hidden = true
+show_symlink = true
+
+[tasks]
+image_alloc = 1073741824 # = 1024*1024*1024 = 1024MB
+suppress_preload = true
+
+[preview]
+cache_dir = "~/.cache/yazi"
+max_width = 2560
+max_height = 1440
+wrap = "yes"
+
+[plugin]
+prepend_previewers = [
+    { mime = "{image,audio,video}/*", run = "mediainfo"},
+    { mime = "application/x-subrip", run = "mediainfo"},
+]
+
+[opener]
+custom = [
+  { run = "dms open %s", desc = "open", for = "linux", orphan = true },
+  { run = "unar %s", desc = "extract", for = "linux", orphan = false, block = true },
+  { run = "chezmoi add %s", desc = "chezmoi", for = "linux" },
+  { run = "nautilus --select %s", desc = "nautilus", for = "linux", orphan = true },
+]
+
+[open]
+rules = [
+	{ url = "*/", use = "custom" },
+	{ url = "*", use = "custom" },
+]

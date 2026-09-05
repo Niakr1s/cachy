@@ -1,0 +1,41 @@
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-shift-q": "pane::CloseActiveItem",
+    },
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-shift-s": "workspace::Save",
+      "ctrl-s": "workspace::SaveWithoutFormat",
+    },
+  },
+  {
+    "context": "Editor && vim_mode == insert",
+    "bindings": {
+      "ctrl-shift-s": "workspace::Save",
+      "ctrl-s": "workspace::SaveWithoutFormat",
+    },
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "ctrl-`": "editor::ToggleFocus",
+      "ctrl-w h": "workspace::ActivatePaneLeft",
+      "ctrl-w k": "workspace::ActivatePaneUp",
+      "ctrl-w l": "workspace::ActivatePaneRight",
+      "ctrl-w [": "pane::ActivatePreviousItem",
+      "ctrl-p": null,
+      "ctrl-n": null,
+      "ctrl-shift-w": "workspace::NewTerminal",
+      "ctrl-shift-q": "pane::CloseActiveItem",
+    },
+  },
+  {
+    "unbind": {
+      "ctrl-shift-w": "workspace::CloseWindow",
+    },
+  },
+]

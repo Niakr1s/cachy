@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Get device ID - use first reachable device or allow specifying
+if [ -n "$1" ]; then
+    DEVICE_ID="$1"
+else
+    # Auto-detect the first reachable device
+    DEVICE_ID=$(kdeconnect-cli -l 2>/dev/null | grep -i "reachable" | head -1 | awk '{print $5}')
+
+    if [ -z "$DEVICE_ID" ]; then
+        echo -e "${RED}Error: No reachable KDE Connect device found.${NC}"
+        echo "Available devices:"
+        kdeconnect-cli -l
+        exit 1
+    fi
+fi
+
+echo -e "${GREEN}Using device: $DEVICE_ID${NC}"
+
+# Check if already mounted by looking for the directory
+MOUNT_POINT="/run/user/1000/$DEVICE_ID"
+STORAGE_PATH="$MOUNT_POINT/storage/emulated/0/"
+
+# Check if mount exists and is accessible
+if [ -d "$STORAGE_PATH" ] && [ -r "$STORAGE_PATH" ]; then
+    echo -e "${GREEN}Already mounted. Changing directory...${NC}"
+    cd "$STORAGE_PATH"
+    exec $SHELL
+    exit 0
+fi
+
+# Mount the device
+echo -e "${YELLOW}Mounting device...${NC}"
+busctl --user call org.kde.kdeconnect /modules/kdeconnect/devices/$DEVICE_ID/sftp org.kde.kdeconnect.device.sftp mountAndWait > /dev/null 2>&1
+
+# Wait a moment for the mount to complete
+sleep 2
+
+# Check if mount succeeded
+if [ -d "$STORAGE_PATH" ] && [ -r "$STORAGE_PATH" ]; then
+    echo -e "${GREEN}Mount successful! Changing directory...${NC}"
+    cd "$STORAGE_PATH"
+    exec $SHELL
+else
+    echo -e "${RED}Mount failed. Trying alternative path...${NC}"
+
+    # Try to find the actual mount path
+    MOUNT_FOUND=$(mount | grep "kdeconnect@.*$DEVICE_ID" | awk '{print $3}')
+    if [ -n "$MOUNT_FOUND" ]; then
+        STORAGE_PATH="$MOUNT_FOUND/storage/emulated/0/"
+        if [ -d "$STORAGE_PATH" ] && [ -r "$STORAGE_PATH" ]; then
+            echo -e "${GREEN}Found mount at: $MOUNT_FOUND${NC}"
+            cd "$STORAGE_PATH"
+            exec $SHELL
+            exit 0
+        fi
+    fi
+
+    echo -e "${RED}Could not mount device. Please check:${NC}"
+    echo "  1. Device is paired and reachable"
+    echo "  2. SFTP/Filesystem Expose plugin is enabled on phone"
+    echo "  3. File permissions are granted on phone"
+    echo -e "\n${YELLOW}Debug info:${NC}"
+    kdeconnect-cli -l
+    exit 1
+fi

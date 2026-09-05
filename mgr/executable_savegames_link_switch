@@ -1,0 +1,158 @@
+#!/bin/bash
+
+# Script to create symlink from Eden save directory to ~/.savegames/switch
+# This allows Eden to use saves stored in ~/.savegames/switch
+
+set -e
+
+# Define paths
+EDEN_BASE="$HOME/.local/share/eden/nand/user/save/0000000000000000"
+SAVEGAMES_DIR="$HOME/.savegames/switch"
+
+# Help message
+show_help() {
+    cat << EOF
+Usage: $0 [OPTIONS]
+
+Create a symlink from Eden's save directory to ~/.savegames/switch.
+This allows Eden to use save files stored in ~/.savegames/switch.
+
+Options:
+    --help, -h     Show this help message
+    --force, -f    Skip all prompts and use first user ID found
+
+The script will:
+    1. Find all user ID directories in Eden's save path
+    2. Let you choose which user ID to use (or auto-select if only one)
+    3. Replace Eden's save directory with a symlink to ~/.savegames/switch
+    4. Eden will then use saves from ~/.savegames/switch
+
+Examples:
+    $0              # Interactive mode
+    $0 --force      # Non-interactive, uses first user ID
+    $0 --help       # Show this help
+
+EOF
+    exit 0
+}
+
+# Parse arguments
+FORCE=false
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --help|-h)
+            show_help
+            ;;
+        --force|-f)
+            FORCE=true
+            shift
+            ;;
+        *)
+            echo "ERROR: Unknown option: $1"
+            echo "Use --help for usage information."
+            exit 1
+            ;;
+    esac
+done
+
+# Check if Eden base directory exists
+if [ ! -d "$EDEN_BASE" ]; then
+    echo "ERROR: Eden base directory not found: $EDEN_BASE"
+    echo "Please make sure Eden is installed and has been run at least once."
+    exit 1
+fi
+
+# Find all user_id directories
+USER_DIRS=()
+while IFS= read -r dir; do
+    if [ -d "$dir" ]; then
+        USER_DIRS+=("$dir")
+    fi
+done < <(find "$EDEN_BASE" -maxdepth 1 -type d -not -path "$EDEN_BASE" | sort)
+
+if [ ${#USER_DIRS[@]} -eq 0 ]; then
+    echo "ERROR: No user ID directories found in $EDEN_BASE"
+    echo "Please make sure Eden has been run at least once to create save data."
+    exit 1
+fi
+
+# Select the user directory
+SELECTED_DIR=""
+if [ ${#USER_DIRS[@]} -eq 1 ]; then
+    SELECTED_DIR="${USER_DIRS[0]}"
+    USER_ID=$(basename "$SELECTED_DIR")
+    echo "Using user ID: $USER_ID"
+elif [ "$FORCE" = true ]; then
+    SELECTED_DIR="${USER_DIRS[0]}"
+    USER_ID=$(basename "$SELECTED_DIR")
+    echo "Force mode: Using first user ID: $USER_ID"
+else
+    echo "Multiple user ID directories found:"
+    for i in "${!USER_DIRS[@]}"; do
+        USER_ID=$(basename "${USER_DIRS[$i]}")
+        echo "  [$((i+1))] $USER_ID"
+    done
+    echo ""
+    
+    while true; do
+        read -p "Select user ID (1-${#USER_DIRS[@]}): " CHOICE
+        if [[ "$CHOICE" =~ ^[0-9]+$ ]] && [ "$CHOICE" -ge 1 ] && [ "$CHOICE" -le ${#USER_DIRS[@]} ]; then
+            SELECTED_DIR="${USER_DIRS[$((CHOICE-1))]}"
+            break
+        else
+            echo "Invalid choice. Please enter a number between 1 and ${#USER_DIRS[@]}"
+        fi
+    done
+fi
+
+# Check if ~/.savegames/switch exists
+if [ ! -d "$SAVEGAMES_DIR" ]; then
+    if [ "$FORCE" = true ]; then
+        echo "Creating $SAVEGAMES_DIR"
+        mkdir -p "$SAVEGAMES_DIR"
+    else
+        echo "WARNING: $SAVEGAMES_DIR does not exist."
+        read -p "Create it? (y/N): " -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            mkdir -p "$SAVEGAMES_DIR"
+        else
+            echo "Operation cancelled."
+            exit 0
+        fi
+    fi
+fi
+
+# Remove existing Eden save directory
+if [ -L "$SELECTED_DIR" ]; then
+    rm "$SELECTED_DIR"
+elif [ -d "$SELECTED_DIR" ]; then
+    if [ "$FORCE" = true ]; then
+        echo "Removing existing directory: $SELECTED_DIR"
+        rm -rf "$SELECTED_DIR"
+    else
+        echo "WARNING: $SELECTED_DIR is a real directory with content."
+        read -p "Remove it and replace with symlink? (y/N): " -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            rm -rf "$SELECTED_DIR"
+        else
+            echo "Operation cancelled."
+            exit 0
+        fi
+    fi
+fi
+
+# Create the symlink
+echo "Creating symlink from $SELECTED_DIR to $SAVEGAMES_DIR"
+ln -s "$SAVEGAMES_DIR" "$SELECTED_DIR"
+
+if [ -L "$SELECTED_DIR" ]; then
+    echo "SUCCESS: Symlink created!"
+    echo "  $SELECTED_DIR -> $SAVEGAMES_DIR"
+    echo ""
+    echo "Eden will now use save files from: $SAVEGAMES_DIR"
+else
+    echo "ERROR: Failed to create symlink."
+    exit 1
+fi
+
+exit 0

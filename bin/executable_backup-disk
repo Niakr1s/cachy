@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+
+usage='Description:
+  backups the mounted drive from /data/<from>/ to /data/<to>/<from>/
+
+Usage:
+'"$0"' [params] -- <from> <to>
+
+Params:
+  --dry-run # will perform dry run
+'
+
+# the common dir, so the disks will be children of it
+# for example "/data/hdd1", "/data/ssd" etc
+from_mnt_dir="/data"
+to_mnt_dir="/data"
+wait_seconds="5"
+
+while [[ -n "$1" ]]; do
+
+        case "$1" in
+        "-h" | "--help")
+                echo "$usage"
+                exit 0
+                ;;
+
+        "--dry-run" | "--dry_run" | "--dry")
+                dry_run="--dry-run"
+                ;;
+
+        "--")
+                shift
+                break
+                ;;
+        *)
+                echo "Unknown parameter: $1"
+                echo
+                echo "$usage"
+                exit 1
+                ;;
+        esac
+
+        shift
+done
+
+if [[ "$#" -ne 2 ]]; then
+        echo "$usage"
+        exit 1
+fi
+
+# here we have two arguments left
+
+from="${1%/}"
+to="${2%/}"
+
+from_mnt="$from_mnt_dir"/"$from"
+to_mnt="$to_mnt_dir"/"$to"
+
+# $1 is a full mount point
+function checkmnt() {
+        if ! findmnt "$1" &>/dev/null; then
+                echo "'$1' is not a mount point"
+                exit 1
+        fi
+}
+
+# $1 is a full mount point
+function checklabel() {
+        label="$1/.backup"
+        if [[ ! -e "$label" ]]; then
+                echo "label '$label' doesn't exist"
+                exit 1
+        fi
+
+        local label_contents_expected="${1##*/}"
+        if [[ $(<"$label") != "$label_contents_expected" ]]; then
+                echo "label '$label' label should contain $label_contents_expected"
+                exit 1
+        fi
+}
+
+checkmnt "$from_mnt"
+checklabel "$from_mnt"
+checkmnt "$to_mnt"
+checklabel "$to_mnt"
+
+backup_cmd=(rsync -avP --delete "$from_mnt"/ "$to_mnt"/"$from"/ --exclude="/.Trash-1000" --exclude="/Download" --exclude="/Downloads")
+
+if [[ -n "$dry_run" ]]; then
+        backup_cmd+=("--dry-run")
+fi
+
+echo "'${backup_cmd[*]}' is about to run in $wait_seconds seconds..."
+
+sleep "$wait_seconds"
+"${backup_cmd[@]}"

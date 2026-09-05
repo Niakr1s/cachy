@@ -1,0 +1,110 @@
+#
+# ~/.bashrc
+#
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+PS1='[\u@\h \W]\$ '
+
+PATH_ADDITIONS=(
+    "$HOME/.local/bin"
+    "$HOME/bin"
+    "$HOME/node_modules/.bin"
+    "$HOME/go/bin"
+    "$HOME/.cargo/bin"
+    "$HOME/.asdf/shims"
+)
+export PATH="$PATH:$(IFS=:; echo "${PATH_ADDITIONS[*]}")"
+
+export EDITOR="nvim"
+export VISUAL="nvim"
+
+function y() {
+    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+    command yazi "$@" --cwd-file="$tmp"
+    IFS= read -r -d '' cwd < "$tmp"
+    [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+    command rm -f -- "$tmp"
+}
+
+function myip() {
+    echo "$(curl -s 2ip.io) (2ip.io)"
+    echo "$(curl -s ifconfig.me) (ifconfig.me)"
+}
+
+alias ff="fastfetch"
+alias se="sudoedit"
+
+# Chezmoi
+alias cz="chezmoi"
+alias cza="chezmoi apply"
+alias cze="chezmoi edit"
+alias czd="chezmoi diff"
+alias czs="chezmoi status"
+alias czm="chezmoi merge-all"
+
+# Git
+alias gst="git status"
+alias gd="git diff"
+alias gds="git diff --staged"
+alias gp="git push"
+alias gl="git pull"
+alias ga="git add"
+alias gc="git commit"
+
+# Eza
+ezaCmd() {
+	eza --group-directories-first --icons "$@"
+}
+ezaCmdTotal() {
+	ezaCmd --total-size "$@"
+}
+alias l="ezaCmd -a"
+alias ll="ezaCmd -l"
+alias la="ezaCmd -la"
+alias latree="ezaCmd -la --tree"
+alias llt="ezaCmdTotal -l"
+alias lat="ezaCmdTotal -la"
+alias lattree="ezaCmdTotal -la --tree"
+
+# Fixes for pagers
+export LESS='-R'
+export PAGER='less -R'
+export GIT_PAGER='less -R'
+
+# FZF config
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude dosdevices --exclude drive_c --exclude .venv'
+export FZF_CTRL_T_OPTS="--preview 'bat -n --color=always {}' --walker-skip .git,node_modules,target,dosdevices,drive_c,.venv"
+export FZF_ALT_C_OPTS="--preview 'tree -C {}' --walker-skip .git,node_modules,target,dosdevices,drive_c,.venv"
+
+# Mount
+luksMountUmount() {
+  local uuid="$1"
+  local label="$2"
+  local mountDir="/data/$label"
+
+
+  eval "$(cat <<EOF
+${label}() {
+  sudo mkdir -p "${mountDir}"
+  sudo cryptsetup luksOpen /dev/disk/by-uuid/${uuid} "${label}"
+  sudo mount /dev/mapper/"${label}" "${mountDir}"
+}
+
+${label}u() {
+  sudo umount "${mountDir}"
+  sudo cryptsetup luksClose "${label}"
+}
+EOF
+  )"
+}
+
+luksMountUmount "5985a2f1-a9ab-4e9f-ae19-280685145e02" "hdd4"
+luksMountUmount "3b5448d2-3780-4cee-8529-caec12d1055e" "hdd20"
+luksMountUmount "fabfb454-6de2-412d-8bc7-b56a849c77c7" "hdd24"
+
+alias backup-etc="sudo borg create --progress /data/hdd1/borg/etc::{now} /etc"
+alias backup-home="borg create --progress /data/hdd1/borg/home::{now} $HOME --exclude '*/.config/rpcs3/dev_hdd0/game/*'"

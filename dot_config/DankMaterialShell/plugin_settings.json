@@ -1,0 +1,50 @@
+{
+  "dankActions": {
+    "enabled": true,
+    "variants": [
+      {
+        "icon": "terminal",
+        "displayText": "",
+        "displayCommand": "[[ \"$(~/bin/vpn status)\" == \"on\" ]] && printf \"\\033[32m\\uf023\\033[0m\\n\" || printf \"\\033[31m\\uf023\\033[0m\\n\"",
+        "clickCommand": "~/bin/vpn toggle",
+        "middleClickCommand": "",
+        "rightClickCommand": "",
+        "updateInterval": 1,
+        "showIcon": false,
+        "showText": true,
+        "visibilityCommand": "",
+        "visibilityInterval": 0,
+        "id": "variant_1787777264970",
+        "name": "VPN"
+      },
+      {
+        "icon": "keyboard",
+        "displayText": "",
+        "displayCommand": "",
+        "clickCommand": "pkill -SIGRTMIN wvkbd-mobintl",
+        "middleClickCommand": "",
+        "rightClickCommand": "",
+        "updateInterval": 0,
+        "showIcon": true,
+        "showText": false,
+        "visibilityCommand": "pgrep wvkbd-mobintl",
+        "visibilityInterval": 5,
+        "id": "variant_1787903278430",
+        "name": "wvkbd"
+      }
+    ]
+  },
+  "wallpaperCarousel": {
+    "enabled": true
+  },
+  "commandRunner": {
+    "enabled": true,
+    "history": [
+      "wow"
+    ]
+  },
+  "calculator": {
+    "enabled": true,
+    "trigger": "="
+  }
+}

@@ -1,0 +1,35 @@
+name: comfyui
+
+services:
+  comfyui:
+    image: yanwk/comfyui-boot:cu130-slim-v2-20260814
+    container_name: comfyui
+    network_mode: "host"
+    # ports:
+    #   - "8188:8188"
+    environment:
+      - CLI_ARGS=
+    volumes:
+      - ./.cache:/root/.cache:Z
+      - ./.config:/root/.config:Z
+      - ./.local:/root/.local:Z
+      - ./workflows:/root/ComfyUI/user/default/workflows:Z
+
+      - ${HOME}/Pictures/comfyui/input:/root/ComfyUI/input:z
+      - ${HOME}/Pictures/comfyui/output:/root/ComfyUI/output:z
+
+      - ${COMFYUI_ROOT}/user-profile:/root/ComfyUI/user:Z
+      - ${COMFYUI_ROOT}/user-scripts:/root/user-scripts:Z
+      - ${COMFYUI_ROOT}/custom_nodes:/root/ComfyUI/custom_nodes:Z
+      - ${COMFYUI_ROOT}/models:/root/ComfyUI/models:Z
+      - ${COMFYUI_ROOT}/hf-hub:/root/.cache/huggingface/hub:Z
+      - ${COMFYUI_ROOT}/torch-hub:/root/.cache/torch/hub:Z
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0', '1']
+              capabilities: [gpu]
+    restart: "no"
+
