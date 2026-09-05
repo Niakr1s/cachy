@@ -100,6 +100,7 @@ APT_PKGS=(
     moonlight-qt
     obsidian
     sunshine
+    obs-studio-browser # cachyos's obs-studio
 
     # hardware
     cpu-x vulkan-driver
