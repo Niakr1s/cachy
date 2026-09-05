@@ -6,6 +6,7 @@ APT_PKGS=(
     paru
     wl-clipboard
     neovim python-pynvim
+    glow
     nvtop
     yazi
     borgbackup python-pyfuse3
@@ -61,8 +62,9 @@ APT_PKGS=(
     cargo lldb
     ruby tk ruby-stdlib
 
-    # virtualization
+    # nvidia
     nvidia-container-toolkit
+    nvidia-prime
 
     # theming
     qt6ct
