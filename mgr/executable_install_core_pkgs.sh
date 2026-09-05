@@ -43,6 +43,7 @@ APT_PKGS=(
     python-pyudev
     python-dbus-fast
     python-xlib
+    fuse2
 
     # fonts
     ttf-firacode-nerd
