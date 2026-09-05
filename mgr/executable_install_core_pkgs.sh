@@ -54,6 +54,7 @@ APT_PKGS=(
     xdg-desktop-portal-gnome
     xdg-desktop-portal-wlr
     syncthing
+    caddy mkcert
 
     # programming
     cmake ninja
