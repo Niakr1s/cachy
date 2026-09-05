@@ -1,0 +1,8 @@
+system:
+  env:
+    UMU_RUNTIME_UPDATE: '0'
+  gamemode: false
+  gpu: card0
+  mangohud: true
+wine:
+  version: Proton - Experimental

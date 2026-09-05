@@ -1,0 +1,6 @@
+[Desktop Entry]
+Hidden=false
+Type=Application
+Name=KeePassXC
+Exec=keepassxc %f
+Icon=keepassxc

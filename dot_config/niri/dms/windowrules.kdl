@@ -1,0 +1,43 @@
+// DMS Window Rules - Managed by DankMaterialShell
+// Do not edit manually - changes may be overwritten
+
+// @id=wr_1787814981139956914 @name=org.keepassxc.KeePassXC
+window-rule {
+    match app-id="^org.keepassxc.KeePassXC$" title="^KeePassXC - Browser Access Request$"
+    open-floating true
+}
+
+// @id=wr_1787834625486111832 @name=steam_app_default
+window-rule {
+    match app-id="^steam_app_default$"
+    open-floating false
+}
+
+// @id=wr_1787916845773432498 @name=org.qbittorrent.qBittorrent
+window-rule {
+    match app-id="^org.qbittorrent.qBittorrent$"
+    open-maximized true
+}
+
+// @id=wr_1787936443357463586 @name=org.gnome.Nautilus
+window-rule {
+    match app-id="^org.gnome.Nautilus$" title="^(Open|Save|Pick)"
+    open-floating true
+    min-width 1024
+    max-width 1024
+    min-height 720
+    max-height 720
+}
+
+// @id=wr_1788190267373420267 @name=losslesscut
+window-rule {
+    match app-id="^losslesscut$"
+    open-maximized true
+}
+
+// @id=wr_1788616025626237898 @name=firefox
+window-rule {
+    match app-id="^firefox$"
+    open-maximized true
+    open-on-workspace "web"
+}

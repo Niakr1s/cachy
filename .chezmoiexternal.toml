@@ -1,0 +1,34 @@
+[".config/DankMaterialShell/plugins"]
+    type = "git-repo"
+    url = "https://github.com/AvengeMedia/dms-plugins.git"
+    refreshPeriod = "168h"
+
+[".config/DankMaterialShell/plugins/wallpaperCarousel"]
+    type = "git-repo"
+    url = "https://github.com/motor-dev/wallpaperCarousel"
+    refreshPeriod = "168h"
+
+[".config/DankMaterialShell/plugins/commandRunner"]
+    type = "git-repo"
+    url = "https://github.com/devnullvoid/dms-command-runner"
+    refreshPeriod = "168h"
+
+[".config/DankMaterialShell/plugins/calculator"]
+    type = "git-repo"
+    url = "https://github.com/rochacbruno/DankCalculator"
+    refreshPeriod = "168h"
+
+[".config/yazi/plugins/mediainfo.yazi"]
+  type = "git-repo"
+  url = "https://github.com/boydaihungst/mediainfo.yazi"
+  refreshPeriod = "168h"
+
+[".config/yazi/plugins/toggle-pane.yazi/main.lua"]
+  type = "file"
+  url = "https://github.com/yazi-rs/plugins/raw/39aaf6dc77e546fe7f7836f102a6c57f96d15365/toggle-pane.yazi/main.lua"
+  refreshPeriod = "168h"
+
+[".tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm"
+    refreshPeriod = "168h"

@@ -1,0 +1,41 @@
+{
+  "identifier": "@local:gemma",
+  "name": "gemma",
+  "changed": true,
+  "operation": {
+    "fields": [
+      {
+        "key": "llm.prediction.temperature",
+        "value": 0.6
+      },
+      {
+        "key": "llm.prediction.topKSampling",
+        "value": 64
+      },
+      {
+        "key": "llm.prediction.repeatPenalty",
+        "value": {
+          "checked": true,
+          "value": 1.1
+        }
+      },
+      {
+        "key": "llm.prediction.topPSampling",
+        "value": {
+          "checked": true,
+          "value": 0.9
+        }
+      },
+      {
+        "key": "llm.prediction.minPSampling",
+        "value": {
+          "checked": true,
+          "value": 0.05
+        }
+      }
+    ]
+  },
+  "load": {
+    "fields": []
+  }
+}
