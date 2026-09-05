@@ -10,20 +10,20 @@ services:
     environment:
       - CLI_ARGS=
     volumes:
-      - ./.cache:/root/.cache:Z
-      - ./.config:/root/.config:Z
-      - ./.local:/root/.local:Z
-      - ./workflows:/root/ComfyUI/user/default/workflows:Z
+      - ./.cache:/root/.cache
+      - ./.config:/root/.config
+      - ./.local:/root/.local
+      - ./workflows:/root/ComfyUI/user/default/workflows
 
-      - ${HOME}/Pictures/comfyui/input:/root/ComfyUI/input:z
-      - ${HOME}/Pictures/comfyui/output:/root/ComfyUI/output:z
+      - ${HOME}/Pictures/comfyui/input:/root/ComfyUI/input
+      - ${HOME}/Pictures/comfyui/output:/root/ComfyUI/output
 
-      - ${COMFYUI_ROOT}/user-profile:/root/ComfyUI/user:Z
-      - ${COMFYUI_ROOT}/user-scripts:/root/user-scripts:Z
-      - ${COMFYUI_ROOT}/custom_nodes:/root/ComfyUI/custom_nodes:Z
-      - ${COMFYUI_ROOT}/models:/root/ComfyUI/models:Z
-      - ${COMFYUI_ROOT}/hf-hub:/root/.cache/huggingface/hub:Z
-      - ${COMFYUI_ROOT}/torch-hub:/root/.cache/torch/hub:Z
+      - ${COMFYUI_ROOT}/user-profile:/root/ComfyUI/user
+      - ${COMFYUI_ROOT}/user-scripts:/root/user-scripts
+      - ${COMFYUI_ROOT}/custom_nodes:/root/ComfyUI/custom_nodes
+      - ${COMFYUI_ROOT}/models:/root/ComfyUI/models
+      - ${COMFYUI_ROOT}/hf-hub:/root/.cache/huggingface/hub
+      - ${COMFYUI_ROOT}/torch-hub:/root/.cache/torch/hub
     deploy:
       resources:
         reservations:
