@@ -3,7 +3,7 @@
 
 // @id=wr_1787814981139956914 @name=org.keepassxc.KeePassXC
 window-rule {
-    match app-id="^org.keepassxc.KeePassXC$" title="^KeePassXC - Browser Access Request$"
+    match app-id="KeePassXC" title="^KeePassXC - Browser Access Request$"
     open-floating true
 }
 
