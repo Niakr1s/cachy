@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Script to create symlink from shadPS4 save directory to ~/.savegames/shadps4/savedata
+
+# Define paths
+SHADPS4_SAVE="$HOME/.local/share/shadPS4/home/1000/savedata"
+SAVEGAMES_DIR="$HOME/.savegames/shadps4/savedata"
+
+# Create the savegames directory if it doesn't exist
+mkdir -p "$SAVEGAMES_DIR"
+
+# Remove existing shadPS4 save directory/symlink if it exists
+rm -rf "$SHADPS4_SAVE"
+
+# Create the symlink
+ln -s "$SAVEGAMES_DIR" "$SHADPS4_SAVE"
+
+echo "Done! $SHADPS4_SAVE -> $SAVEGAMES_DIR"
