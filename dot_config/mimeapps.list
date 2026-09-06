@@ -145,3 +145,4 @@ text/xml=org.gnome.TextEditor.desktop
 text/markdown=org.gnome.TextEditor.desktop
 x-scheme-handler/discord-424004941485572097=discord-424004941485572097.desktop
 x-scheme-handler/throne=throne-url-handler.desktop
+application/x-ms-dos-executable;application/x-wine-extension-msp;application/x-msi;application/x-msdos-program;text/win-bat;=PortProton.desktop
