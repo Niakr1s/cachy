@@ -22,6 +22,20 @@ export PATH="$PATH:$(IFS=:; echo "${PATH_ADDITIONS[*]}")"
 export EDITOR="nvim"
 export VISUAL="nvim"
 
+# Ignore commands that start with spaces and duplicates.
+export HISTCONTROL=ignoreboth
+
+# Don't add certain commands to the history file.
+export HISTORY_IGNORE="(\&|[bf]g|c|clear|history|exit|q|pwd|* --help)"
+
+# Use custom `less` colors for `man` pages.
+export LESS_TERMCAP_md="$(tput bold 2> /dev/null; tput setaf 2 2> /dev/null)"
+export LESS_TERMCAP_me="$(tput sgr0 2> /dev/null)"
+
+# Make new shells get the history lines from all previous
+# shells instead of the default "last window closed" history.
+export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+
 function y() {
     local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
     command yazi "$@" --cwd-file="$tmp"
@@ -34,6 +48,22 @@ function myip() {
     echo "$(curl -s 2ip.io) (2ip.io)"
     echo "$(curl -s ifconfig.me) (ifconfig.me)"
 }
+
+# ALIASES
+alias make="make -j`nproc`"
+alias ninja="ninja -j`nproc`"
+alias n="ninja"
+alias c="clear"
+alias pacfix="sudo rm /var/lib/pacman/db.lck"
+
+# Cleanup orphaned packages
+alias pacclean="sudo pacman -Rsn $(pacman -Qtdq)"
+
+# Get the error messages from journalctl
+alias jctl="journalctl -p 3 -xb"
+
+# Recent installed packages
+alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
 
 alias ff="fastfetch"
 alias se="sudoedit"
@@ -57,10 +87,10 @@ alias gc="git commit"
 
 # Eza
 ezaCmd() {
-	eza --group-directories-first --icons "$@"
+    eza --group-directories-first --icons "$@"
 }
 ezaCmdTotal() {
-	ezaCmd --total-size "$@"
+    ezaCmd --total-size "$@"
 }
 alias l="ezaCmd -a"
 alias ll="ezaCmd -l"
@@ -82,12 +112,12 @@ export FZF_ALT_C_OPTS="--preview 'tree -C {}' --walker-skip .git,node_modules,ta
 
 # Mount
 luksMountUmount() {
-  local uuid="$1"
-  local label="$2"
-  local mountDir="/data/$label"
+    local uuid="$1"
+    local label="$2"
+    local mountDir="/data/$label"
 
 
-  eval "$(cat <<EOF
+    eval "$(cat <<EOF
 ${label}() {
   sudo mkdir -p "${mountDir}"
   sudo cryptsetup luksOpen /dev/disk/by-uuid/${uuid} "${label}"
