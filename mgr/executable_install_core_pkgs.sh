@@ -52,7 +52,7 @@ APT_PKGS=(
 
     # fonts
     ttf-firacode-nerd
-    ttf-inconsolata-lgc-nerd
+    ttf-iosevka-nerd
 
     # services
     xdg-desktop-portal-gnome
