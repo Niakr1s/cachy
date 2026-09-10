@@ -206,7 +206,9 @@
   "audioScrollMode": "volume",
   "audioWheelScrollAmount": 5,
   "audioDeviceScrollVolumeEnabled": false,
-  "mediaExcludePlayers": [],
+  "mediaExcludePlayers": [
+    "org.kde.kdeconnect.app"
+  ],
   "clockCompactMode": false,
   "focusedWindowCompactMode": false,
   "focusedWindowSize": 1,
