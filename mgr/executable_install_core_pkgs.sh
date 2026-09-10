@@ -46,6 +46,10 @@ APT_PKGS=(
     python-xlib
     fuse2
 
+    # deps
+    ddcutil
+    i2c-tools
+
     # fonts
     ttf-firacode-nerd
     ttf-inconsolata-lgc-nerd
