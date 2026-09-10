@@ -81,8 +81,6 @@ APT_PKGS=(
     librecad
     mission-center
     gthumb
-    firefox
-    chromium
     qbittorrent
     nautilus
     sqlitebrowser
@@ -107,6 +105,12 @@ APT_PKGS=(
     sunshine
     obs-studio-browser # cachyos's obs-studio
     kdenlive
+
+    # browsers
+    firefox
+    chromium
+    zen-browser-bin
+
 
     # hardware
     cpu-x vulkan-driver
