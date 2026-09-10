@@ -102,6 +102,7 @@ APT_PKGS=(
     obsidian
     sunshine
     obs-studio-browser # cachyos's obs-studio
+    kdenlive
 
     # hardware
     cpu-x vulkan-driver
