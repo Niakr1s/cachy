@@ -12,13 +12,14 @@ import sys
 # ============================================================
 CONFIG = """
 [org/gnome/TextEditor]
-custom-font='Inconsolata LGC Nerd Font Bold 11'
+custom-font='Iosevka Nerd Font Mono 11'
 highlight-current-line=true
 restore-session=false
 show-line-numbers=true
 spellcheck=false
 tab-width=uint32 4
 use-system-font=false
+style-scheme='Adwaita-dark'
 
 [org/gnome/desktop/interface]
 color-scheme='prefer-dark'
