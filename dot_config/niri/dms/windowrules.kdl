@@ -41,3 +41,9 @@ window-rule {
     open-maximized true
     open-on-workspace "web"
 }
+
+// @id=wr_1789064837146826923 @name=Hearthstone
+window-rule {
+    match title="Hearthstone"
+    open-maximized true
+}
