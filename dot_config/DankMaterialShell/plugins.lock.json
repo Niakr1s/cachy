@@ -14,6 +14,22 @@
       "path": "DankActions",
       "commit": "6fc7f25bfb24f93b6488fb8a36ed67b5f242abdb"
     },
+    "dockerManager": {
+      "repo": "https://github.com/LuckShiba/DmsDockerManager",
+      "commit": "9e6a01283e169c46eff7a157202b1b8ab48577b1"
+    },
+    "emojiLauncher": {
+      "repo": "https://github.com/devnullvoid/dms-emoji-launcher",
+      "commit": "8ff394e3ddfcb2fd755ed2e7b4c6f01f3e26e596"
+    },
+    "networkIndicator": {
+      "repo": "https://github.com/gemb0-0/Network-Indicator.git",
+      "commit": "81d948dbabceba0f446a0441f3901a4d6b6b2f3a"
+    },
+    "quickCapture": {
+      "repo": "https://github.com/hthienloc/dms-quick-capture",
+      "commit": "045ce4f645363d421f1fdaf92388d6c65989cd00"
+    },
     "wallpaperCarousel": {
       "repo": "https://github.com/motor-dev/wallpaperCarousel",
       "commit": "761ecd1b7f347beee9f17909f8334d987c935a1a"

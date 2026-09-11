@@ -130,7 +130,7 @@
       "leftWidgets": [
         {
           "id": "launcherButton",
-          "enabled": false
+          "enabled": true
         },
         "workspaceSwitcher",
         "focusedWindow"
@@ -150,19 +150,40 @@
       ],
       "rightWidgets": [
         {
+          "id": "networkIndicator",
+          "enabled": true
+        },
+        {
           "id": "network_speed_monitor",
+          "enabled": false
+        },
+        {
+          "id": "dockerManager",
           "enabled": true
         },
         "systemTray",
-        "clipboard",
         "cpuUsage",
         "memUsage",
         {
-          "id": "notificationButton",
-          "enabled": false
+          "id": "quickCapture",
+          "enabled": true
         },
-        "battery",
-        "controlCenterButton"
+        {
+          "id": "clipboard",
+          "enabled": true
+        },
+        {
+          "id": "battery",
+          "enabled": true
+        },
+        {
+          "id": "notificationButton",
+          "enabled": true
+        },
+        {
+          "id": "controlCenterButton",
+          "enabled": false
+        }
       ],
       "spacing": 0,
       "innerPadding": 4,
@@ -196,13 +217,54 @@
       "island": true,
       "islandFloating": false,
       "islandUseOverlayLayer": false,
-      "islandReserveThickness": 40,
-      "islandOuterGap": 4,
+      "islandReserveThickness": 36,
+      "islandOuterGap": 0,
       "islandAlongOffset": 0,
-      "islandHomeCompactTight": true,
+      "islandHomeCompactTight": false,
       "islandNotificationExpand": false,
       "islandSatellitePosition": "edges",
-      "islandInteractionMode": "click"
+      "islandInteractionMode": "hybrid",
+      "islandNotificationBadgeClearOnOpen": true,
+      "islandHomeLayout": [
+        {
+          "id": "volume",
+          "enabled": true
+        },
+        {
+          "id": "clock",
+          "enabled": true
+        },
+        {
+          "id": "weather",
+          "enabled": true
+        },
+        {
+          "id": "status",
+          "enabled": true
+        },
+        {
+          "id": "media",
+          "enabled": false
+        },
+        {
+          "id": "notifications",
+          "enabled": false
+        },
+        {
+          "id": "brightness",
+          "enabled": false
+        }
+      ],
+      "islandCompactThickness": 32,
+      "islandSatelliteBackground": true,
+      "islandSatelliteGothCorners": false,
+      "islandSatelliteTransparency": 1,
+      "islandHomeBrightnessDisplay": "both",
+      "islandMediaClockVisible": true,
+      "islandHomeVolumeDisplay": "icon",
+      "islandPalette": "default",
+      "islandCornerRadius": 8,
+      "islandHomeClockDisplay": "both"
     }
   ],
   "desktopClockCustomColor": {

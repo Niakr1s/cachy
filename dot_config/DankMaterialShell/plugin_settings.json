@@ -43,11 +43,30 @@
   "commandRunner": {
     "enabled": true,
     "history": [
-      "wow"
     ]
   },
   "calculator": {
     "enabled": true,
     "trigger": "="
+  },
+  "quickCapture": {
+    "enabled": true,
+    "recordMic": true,
+    "doneAction": "file",
+    "middleClickAction": "scroll"
+  },
+  "networkIndicator": {
+    "enabled": true,
+    "displayUnit": "mbps"
+  },
+  "emojiLauncher": {
+    "enabled": true,
+    "pasteOnSelect": true
+  },
+  "dockerManager": {
+    "enabled": true,
+    "dockerBinary": "podman",
+    "terminalApp": "kitty",
+    "groupByCompose": false
   }
 }
