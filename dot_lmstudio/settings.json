@@ -1,6 +1,6 @@
 {
   "language": "en",
-  "downloadsFolder": "/data/ssd/comfyui/models/LLM",
+  "downloadsFolder": "/home/user/data/ssd/comfyui/models/LLM",
   "sidebar": {
     "showButtonNames": false,
     "monochromeSidebarIcons": true
