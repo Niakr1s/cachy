@@ -114,8 +114,6 @@ APT_PKGS=(
     # browsers
     firefox
     chromium
-    zen-browser-bin
-
 
     # hardware
     cpu-x vulkan-driver
