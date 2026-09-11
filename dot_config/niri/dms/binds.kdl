@@ -6,7 +6,6 @@ binds {
     Mod+D hotkey-overlay-title="Application Launcher" { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
     Mod+I hotkey-overlay-title="Idle Inhibit: Toggle" { spawn "dms" "ipc" "call" "inhibit" "toggle"; }
     Mod+N hotkey-overlay-title="Notepad" { spawn "dms" "ipc" "call" "notepad" "toggle"; }
-    Mod+V hotkey-overlay-title="Clipboard Manager" { spawn "dms" "ipc" "call" "clipboard" "toggle"; }
     Mod+W hotkey-overlay-title="wallpaperCarousel" { spawn "sh" "-c" "dms ipc wallpaperCarousel toggle"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "decrement" "3"; }
     XF86AudioMicMute allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "micmute"; }
@@ -50,7 +49,7 @@ binds {
     Mod+Ctrl+F { expand-column-to-available-width; }
     Mod+Ctrl+H { move-column-left; }
     Mod+Ctrl+L { move-column-right; }
-    Mod+Ctrl+Shift+F { toggle-window-floating; }
+    Mod+V { toggle-window-floating; }
     Mod+Ctrl+Shift+J { move-window-down; }
     Mod+Ctrl+Shift+K { move-window-up; }
     Mod+Ctrl+Shift+Q repeat=false { close-window; }
