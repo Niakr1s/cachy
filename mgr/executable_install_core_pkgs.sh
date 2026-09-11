@@ -66,6 +66,7 @@ APT_PKGS=(
 
     # programming
     cmake ninja
+    uv
     go
     nodejs npm deno
     cargo lldb
