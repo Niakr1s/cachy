@@ -25,7 +25,12 @@
     "visualizeSpeculativeDecoding": false,
     "chatFullWidth": false,
     "neverAskForToolConfirmation": false,
-    "skipToolConfirmationPatterns": [],
+    "skipToolConfirmationPatterns": [
+      "mcp/duckduckgo:*",
+      "mcp/sequential-thinking:sequentialthinking",
+      "mcp/sequential-thinking:*",
+      "mcp/fetch:*"
+    ],
     "showChatUtilityMenuLabels": true,
     "pinnedPlugins": [],
     "showRoleAndInsertButtons": false,
@@ -71,7 +76,7 @@
   "ui": {
     "missionControlFullscreen": false,
     "showModelFileNameInMyModels": false,
-    "configureLoadParamsBeforeLoad": false,
+    "configureLoadParamsBeforeLoad": true,
     "alwaysOpenModelLoaderFromPicker": false,
     "contextDisplayMode": "percentage",
     "appNavigationBarPosition": "left",
@@ -88,7 +93,7 @@
     "speculativeDecoding": false
   },
   "toggledConfigDropdowns": [],
-  "developerMode": false,
+  "developerMode": true,
   "userInterfaceComplexityLevel": 0,
   "appFirstLoad": false,
   "autoLoadBundledLLM": true,
@@ -98,7 +103,9 @@
     "alwaysAllowLoadAnyway": false
   },
   "dismissedModals": [
-    "LM Link Sidebar Button Popover"
+    "LM Link Sidebar Button Popover",
+    "mcp.json Warning",
+    "Trash Deletion Onboarding"
   ],
   "dismissedConversationSnackbars": [],
   "pre030ChatsMigrated": 3,
