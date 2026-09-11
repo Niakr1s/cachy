@@ -77,6 +77,7 @@ APT_PKGS=(
     nvidia-prime
 
     # theming
+    qt5ct
     qt6ct
     adw-gtk-theme
 
