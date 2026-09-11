@@ -35,6 +35,7 @@ APT_PKGS=(
     imagemagick
     gpu-viewer
     gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly
+    evtest
 
     # archive
     unarchiver zip unzip unrar lz4 7zip
@@ -49,6 +50,8 @@ APT_PKGS=(
     # deps
     ddcutil
     i2c-tools
+    wtype
+    ydotool
 
     # fonts
     ttf-firacode-nerd
