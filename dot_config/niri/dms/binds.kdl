@@ -68,7 +68,8 @@ binds {
     Mod+Shift+Minus { set-window-height "-10%"; }
     Mod+Shift+R { switch-preset-window-height; }
     Mod+Delete { power-off-monitors; }
-    Print { spawn-sh "dms screenshot scroll"; } // { screenshot; }
+    // Print // { spawn-sh "dms screenshot scroll"; } // { screenshot; }
+    Print { spawn "dms" "ipc" "call" "quickCapture" "screenshot" "scrol" "edit"; }
     Mod+E { spawn "nautilus"; }
     Mod+Return hotkey-overlay-title="Open Terminal" { spawn "kitty"; }
     Mod+Tab repeat=false { toggle-overview; }
