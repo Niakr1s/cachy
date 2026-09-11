@@ -36,6 +36,7 @@ APT_PKGS=(
     gpu-viewer
     gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly
     evtest
+    yt-dlp
 
     # archive
     unarchiver zip unzip unrar lz4 7zip
@@ -66,7 +67,7 @@ APT_PKGS=(
     # programming
     cmake ninja
     go
-    nodejs npm
+    nodejs npm deno
     cargo lldb
     ruby tk ruby-stdlib
 
