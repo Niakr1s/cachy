@@ -29,7 +29,9 @@
       "mcp/duckduckgo:*",
       "mcp/sequential-thinking:sequentialthinking",
       "mcp/sequential-thinking:*",
-      "mcp/fetch:*"
+      "mcp/fetch:*",
+      "mcp/time:get_current_time",
+      "mcp/time:*"
     ],
     "showChatUtilityMenuLabels": true,
     "pinnedPlugins": [],
