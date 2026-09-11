@@ -191,7 +191,7 @@
       "transparency": 1,
       "widgetTransparency": 1,
       "squareCorners": true,
-      "noBackground": false,
+      "noBackground": true,
       "gothCornersEnabled": false,
       "gothCornerRadiusOverride": false,
       "gothCornerRadiusValue": 12,
@@ -223,7 +223,7 @@
       "islandHomeCompactTight": false,
       "islandNotificationExpand": false,
       "islandSatellitePosition": "edges",
-      "islandInteractionMode": "hybrid",
+      "islandInteractionMode": "click",
       "islandNotificationBadgeClearOnOpen": true,
       "islandHomeLayout": [
         {
@@ -263,8 +263,13 @@
       "islandMediaClockVisible": true,
       "islandHomeVolumeDisplay": "icon",
       "islandPalette": "default",
-      "islandCornerRadius": 8,
-      "islandHomeClockDisplay": "both"
+      "islandCornerRadius": 12,
+      "islandHomeClockDisplay": "both",
+      "hoverPopouts": false,
+      "islandTransparency": 1,
+      "maximizeWidgetIcons": false,
+      "maximizeWidgetText": false,
+      "iconScale": 1
     }
   ],
   "desktopClockCustomColor": {
