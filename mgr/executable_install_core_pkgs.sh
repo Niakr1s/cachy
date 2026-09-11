@@ -141,7 +141,7 @@ CARGO_PKGS=(
 
 AM_PKGS=(
     losslesscut
-    nomacs
+    crossmacro
 )
 
 apt_install "${APT_PKGS[@]}"
