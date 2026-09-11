@@ -95,7 +95,7 @@ volume = 0.7
 # .en models are English-only but faster and more accurate for English
 # large-v3-turbo is faster than large-v3 with minimal accuracy loss (recommended for GPU)
 # Or provide absolute path to a custom .bin model file
-model = "small.en"
+model = "small"
 
 # Language for transcription
 # Options:
@@ -105,7 +105,7 @@ model = "small.en"
 # The array form helps with multilingual users where Whisper might misdetect
 # the language, especially for short sentences.
 # See: https://github.com/openai/whisper#available-models-and-languages
-language = "en"
+language = ["en", "ru"]
 
 # Translate non-English speech to English
 translate = true
