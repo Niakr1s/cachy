@@ -110,6 +110,7 @@ APT_PKGS=(
     obsidian
     sunshine
     obs-studio-browser # cachyos's obs-studio
+    gpu-screen-recorder
     kdenlive
 
     # browsers
