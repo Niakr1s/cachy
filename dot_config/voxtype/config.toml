@@ -118,7 +118,7 @@ translate = true
 # causing slower transcription. For different-vendor setups (e.g., Intel iGPU +
 # NVIDIA dGPU), use VOXTYPE_VULKAN_DEVICE=nvidia instead (simpler).
 # Use gpu_device for same-vendor GPUs or precise index control.
-gpu_device = 2
+# gpu_device = 0
 
 # Enable flash attention for GPU inference (default: false)
 # Reduces memory usage (~75%) and improves speed (~10%) on CUDA/Vulkan.
