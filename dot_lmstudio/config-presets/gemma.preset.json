@@ -35,7 +35,7 @@
       },
       {
         "key": "llm.prediction.systemPrompt",
-        "value": "You are a helpful assistant. You must use \"sequentialthinking\" tool to split the task by steps. You are allowed to use \"search\" tool to search something via duckduckgo. You are allowed to fetch web pages using \"fetch\" tool."
+        "value": "You are a helpful assistant. You must use \"sequentialthinking\" tool to split the task by steps. You are allowed to use \"search\" tool to search something via duckduckgo. You are allowed to fetch web pages using \"fetch_content\" tool."
       }
     ]
   },
