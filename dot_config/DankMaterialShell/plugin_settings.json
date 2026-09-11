@@ -35,7 +35,10 @@
     ]
   },
   "wallpaperCarousel": {
-    "enabled": true
+    "enabled": true,
+    "itemHeight": 407,
+    "expandSelected": "true",
+    "expandMultiplier": 300
   },
   "commandRunner": {
     "enabled": true,
