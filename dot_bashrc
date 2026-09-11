@@ -114,7 +114,7 @@ export FZF_ALT_C_OPTS="--preview 'tree -C {}' --walker-skip .git,node_modules,ta
 luksMountUmount() {
     local uuid="$1"
     local label="$2"
-    local mountDir="$HOME/data/$label"
+    local mountDir="$HOME/drives/$label"
 
 
     eval "$(cat <<EOF
@@ -136,8 +136,8 @@ luksMountUmount "5985a2f1-a9ab-4e9f-ae19-280685145e02" "hdd4"
 luksMountUmount "3b5448d2-3780-4cee-8529-caec12d1055e" "hdd20"
 luksMountUmount "fabfb454-6de2-412d-8bc7-b56a849c77c7" "hdd24"
 
-alias backup-etc="sudo borg create --progress $HOME/data/hdd1/borg/etc::{now} /etc"
-alias backup-home="borg create --progress $HOME/data/hdd1/borg/home::{now} $HOME --exclude '$HOME/.config/rpcs3/dev_hdd0/game/*' --exclude '$HOME/data'"
+alias backup-etc="sudo borg create --progress $HOME/drives/hdd1/borg/etc::{now} /etc"
+alias backup-home="borg create --progress $HOME/drives/hdd1/borg/home::{now} $HOME --exclude '$HOME/.config/rpcs3/dev_hdd0/game/*' --exclude '$HOME/drives'"
 
 proxy-shell() {
     local p="http://127.0.0.1:2080"
