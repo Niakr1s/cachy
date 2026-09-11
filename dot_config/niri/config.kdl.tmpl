@@ -193,3 +193,9 @@ include optional=true "dms/binds.kdl"
 include optional=true "dms/outputs.kdl"
 include optional=true "dms/cursor.kdl"
 include "dms/windowrules.kdl"
+
+// override dms window rule
+window-rule {
+    match app-id="^com.danklinux.dms$"
+    open-floating false
+}
