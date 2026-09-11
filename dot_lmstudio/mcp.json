@@ -3,8 +3,16 @@
     "duckduckgo": {
       "command": "uvx",
       "args": [
-        "duckduckgo-mcp-server"
-      ]
+        "--with",
+        "duckduckgo-mcp-server[browser]",
+        "duckduckgo-mcp-server",
+        "--fetch-backend",
+        "auto"
+      ],
+      "env": {
+        "DDG_SAFE_SEARCH": "OFF",
+        "DDG_REGION": "us-en"
+      }
     },
     "time": {
       "command": "uvx",
