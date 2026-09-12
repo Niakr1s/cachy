@@ -12,8 +12,7 @@ show_usage() {
 Usage: caddy-proxy [command] [options]
 
 Commands:
-  add [domain] [target]    Creates an isolated config file under conf.d/ and updates hosts
-  update [domain] [target] Updates the reverse_proxy target of an existing proxy
+  add [domain] [target]    Creates or updates the proxy for the given domain
   remove [domain]          Deletes the domain's config file and its hosts entry
   list                     Lists all active proxies
   status                   Shows Caddy service status, config validation and active proxies
@@ -23,11 +22,12 @@ Commands:
 Notes:
   All proxies are created as plain HTTP. Bare domains are treated as http://<domain>.
   Passing http:// explicitly is also accepted; any other scheme is ignored.
+  If the domain already exists, 'add' overwrites the target and keeps the entry.
 
 Examples:
-  caddy-proxy add app.local 3000            # -> http://app.local
+  caddy-proxy add app.local 3000            # creates http://app.local
+  caddy-proxy add app.local 4000            # updates target to localhost:4000
   caddy-proxy add http://app.local 3000     # same as above
-  caddy-proxy update app.local 4000         # changes target to localhost:4000
 EOF
 
     exit "$exit_code"
@@ -73,10 +73,6 @@ reload_caddy() {
 
 escape_sed_regex() {
     printf '%s' "$1" | sed -e 's/[][\/\.^$*+?{}|()]/\\&/g'
-}
-
-escape_sed_replacement() {
-    printf '%s' "$1" | sed -e 's/[\/&|\\]/\\&/g'
 }
 
 hosts_contains_domain() {
@@ -157,73 +153,34 @@ case "$COMMAND" in
 
         ensure_caddyfile_import
 
+        # Upsert: create if missing, otherwise update in place
         if [ -f "$DOMAIN_CONFIG_PATH" ]; then
-            echo "❌ Error: A configuration file already exists at $DOMAIN_CONFIG_PATH."
-            echo "💡 Use 'caddy-proxy update' instead."
-            exit 1
-        fi
+            old_target=$(awk '/reverse_proxy/ {print $2; exit}' "$DOMAIN_CONFIG_PATH")
 
-        printf "%s {\n    reverse_proxy %s\n}\n" "$DOMAIN" "$TARGET" \
-            | sudo tee "$DOMAIN_CONFIG_PATH" >/dev/null
-        sudo chmod 644 "$DOMAIN_CONFIG_PATH"
-        echo "📝 Created isolated config: $DOMAIN_CONFIG_PATH ➡️  $TARGET"
+            if [ -z "$old_target" ]; then
+                echo "❌ Error: Existing config is malformed (no reverse_proxy line)."
+                exit 1
+            fi
+
+            printf "%s {\n    reverse_proxy %s\n}\n" "$DOMAIN" "$TARGET" \
+                | sudo tee "$DOMAIN_CONFIG_PATH" >/dev/null
+            echo "📝 Updated proxy: $DOMAIN_CONFIG_PATH  $old_target ➡️  $TARGET"
+        else
+            printf "%s {\n    reverse_proxy %s\n}\n" "$DOMAIN" "$TARGET" \
+                | sudo tee "$DOMAIN_CONFIG_PATH" >/dev/null
+            sudo chmod 644 "$DOMAIN_CONFIG_PATH"
+            echo "📝 Created proxy: $DOMAIN_CONFIG_PATH ➡️  $TARGET"
+        fi
 
         add_hosts_entry "$RAW_DOMAIN"
 
         if ! reload_caddy; then
-            echo "⚠️  Rolling back config file because Caddy reload failed."
-            sudo rm -f "$DOMAIN_CONFIG_PATH"
-            exit 1
-        fi
-        ;;
-
-    update)
-        if [ -z "$DOMAIN" ] || [ -z "$TARGET" ]; then
-            echo "❌ Error: Missing domain or target."
-            show_usage
-        fi
-
-        if [ ! -f "$DOMAIN_CONFIG_PATH" ]; then
-            echo "❌ Error: No active configuration found for '$RAW_DOMAIN' at $DOMAIN_CONFIG_PATH."
-            exit 1
-        fi
-
-        if [[ "$TARGET" =~ ^[0-9]+$ ]]; then
-            TARGET="localhost:$TARGET"
-        fi
-
-        # Capture current state for rollback
-        old_target=$(awk '/reverse_proxy/ {print $2; exit}' "$DOMAIN_CONFIG_PATH")
-        old_site=$(grep -m1 -E '^[^#]*\{' "$DOMAIN_CONFIG_PATH" | sed -E 's/[[:space:]]*\{.*$//')
-
-        if [ -z "$old_target" ]; then
-            echo "❌ Error: Could not detect existing reverse_proxy target in $DOMAIN_CONFIG_PATH."
-            exit 1
-        fi
-
-        # Apply target change
-        escaped_target=$(escape_sed_replacement "$TARGET")
-        sudo sed -i -E "s|^([[:space:]]*reverse_proxy[[:space:]]+).*$|\1${escaped_target}|" "$DOMAIN_CONFIG_PATH"
-        echo "📝 Updated reverse_proxy target: $old_target ➡️  $TARGET"
-
-        # Force the site address back to http://<domain>
-        scheme_changed=0
-        if [ "$old_site" != "$DOMAIN" ]; then
-            scheme_changed=1
-            escaped_domain=$(escape_sed_replacement "$DOMAIN")
-            sudo sed -i -E "0,/^[^#]*\{/s|^[^#]*\{|${escaped_domain} {|" "$DOMAIN_CONFIG_PATH"
-            echo "📝 Updated site address: $old_site ➡️  $DOMAIN"
-        fi
-
-        if ! reload_caddy; then
-            echo "⚠️  Rolling back changes because Caddy reload failed."
-
-            escaped_old_target=$(escape_sed_replacement "$old_target")
-            sudo sed -i -E "s|^([[:space:]]*reverse_proxy[[:space:]]+).*$|\1${escaped_old_target}|" "$DOMAIN_CONFIG_PATH"
-
-            if [ "$scheme_changed" = "1" ]; then
-                escaped_old_site=$(escape_sed_replacement "$old_site")
-                sudo sed -i -E "0,/^[^#]*\{/s|^[^#]*\{|${escaped_old_site} {|" "$DOMAIN_CONFIG_PATH"
+            echo "⚠️  Rolling back $DOMAIN_CONFIG_PATH because Caddy reload failed."
+            if [ -n "$old_target" ]; then
+                printf "%s {\n    reverse_proxy %s\n}\n" "$DOMAIN" "$old_target" \
+                    | sudo tee "$DOMAIN_CONFIG_PATH" >/dev/null
+            else
+                sudo rm -f "$DOMAIN_CONFIG_PATH"
             fi
             exit 1
         fi
