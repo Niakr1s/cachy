@@ -1,0 +1,431 @@
+#!/usr/bin/env bash
+
+# Configuration - Directory-based approach
+CADDYFILE_PATH="/etc/caddy/Caddyfile"
+CONF_DIR="/etc/caddy/conf.d"
+HOSTS_FILE="/etc/hosts"
+
+show_usage() {
+    local exit_code="${1:-1}"
+
+    cat <<'EOF'
+Usage: caddy-proxy [command] [options]
+
+Commands:
+  add [domain] [target]    Creates an isolated config file under conf.d/ and updates hosts
+  update [domain] [target] Updates the reverse_proxy target of an existing proxy
+  remove [domain]          Deletes the domain's config file and its hosts entry
+  list                     Lists all active proxies
+  status                   Shows Caddy service status, config validation and active proxies
+  doctor                   Runs environment and configuration health checks
+  help                     Show this help message
+
+Notes:
+  All proxies are created as plain HTTP. Bare domains are treated as http://<domain>.
+  Passing http:// explicitly is also accepted; any other scheme is ignored.
+
+Examples:
+  caddy-proxy add app.local 3000            # -> http://app.local
+  caddy-proxy add http://app.local 3000     # same as above
+  caddy-proxy update app.local 4000         # changes target to localhost:4000
+EOF
+
+    exit "$exit_code"
+}
+
+ensure_caddyfile_import() {
+    local import_line="import ${CONF_DIR}/*"
+
+    if [ ! -f "$CADDYFILE_PATH" ]; then
+        echo "⚠️  $CADDYFILE_PATH not found. Creating it..."
+        sudo mkdir -p "$(dirname "$CADDYFILE_PATH")"
+        printf "# Main Caddy Configuration\n" | sudo tee "$CADDYFILE_PATH" >/dev/null
+        sudo chmod 644 "$CADDYFILE_PATH"
+    fi
+
+    if ! sudo grep -qF "$import_line" "$CADDYFILE_PATH"; then
+        echo "⚙️  Adding '$import_line' to $CADDYFILE_PATH..."
+        printf "\n# Import additional caddy config files\n%s\n" "$import_line" | sudo tee -a "$CADDYFILE_PATH" >/dev/null
+    fi
+}
+
+reload_caddy() {
+    echo "🔄 Reloading Caddy configuration..."
+
+    if ! command -v caddy >/dev/null 2>&1; then
+        echo "❌ Caddy executable not found."
+        return 1
+    fi
+
+    if ! sudo caddy validate --config "$CADDYFILE_PATH" >/dev/null 2>&1; then
+        echo "❌ Syntax verification failed! Please check your file formatting manually."
+        return 1
+    fi
+
+    if sudo systemctl reload caddy >/dev/null 2>&1 || sudo caddy reload --config "$CADDYFILE_PATH" >/dev/null 2>&1; then
+        echo "✅ Caddy reloaded successfully!"
+        return 0
+    fi
+
+    echo "❌ Warning: Failed to reload Caddy automatically."
+    return 1
+}
+
+escape_sed_regex() {
+    printf '%s' "$1" | sed -e 's/[][\/\.^$*+?{}|()]/\\&/g'
+}
+
+escape_sed_replacement() {
+    printf '%s' "$1" | sed -e 's/[\/&|\\]/\\&/g'
+}
+
+hosts_contains_domain() {
+    local domain="$1"
+
+    awk -v d="$domain" '
+        { for (i = 1; i <= NF; i++) if ($i == d) { found = 1; exit } }
+        END { exit !found }
+    ' "$HOSTS_FILE"
+}
+
+remove_hosts_entry() {
+    local domain="$1"
+
+    [ "$domain" = "localhost" ] && return 0
+
+    if hosts_contains_domain "$domain"; then
+        local escaped
+        escaped=$(escape_sed_regex "$domain")
+
+        sudo sed -i -E \
+            "/^[[:space:]]*127[.]0[.]0[.]1[[:space:]]+${escaped}([[:space:]]|$)/d" \
+            "$HOSTS_FILE"
+
+        echo "🗑️  Removed local DNS entry for '$domain' from $HOSTS_FILE."
+    fi
+}
+
+add_hosts_entry() {
+    local domain="$1"
+
+    [ "$domain" = "localhost" ] && return 0
+
+    if hosts_contains_domain "$domain"; then
+        echo "ℹ️  Note: '$domain' already exists in $HOSTS_FILE. Skipping hosts addition."
+        return 0
+    fi
+
+    printf "127.0.0.1\t%s\n" "$domain" | sudo tee -a "$HOSTS_FILE" >/dev/null
+    echo "🌐 Added local DNS entry to $HOSTS_FILE: 127.0.0.1 ➡️  $domain"
+}
+
+COMMAND="${1:-}"
+DOMAIN="${2:-}"
+TARGET="${3:-}"
+
+# Strip any scheme; everything is HTTP anyway
+BARE_DOMAIN=$(printf '%s' "$DOMAIN" | sed -e 's|^[^/]*//||')
+
+# Always normalize to http://
+if [ -n "$BARE_DOMAIN" ]; then
+    DOMAIN="http://$BARE_DOMAIN"
+fi
+
+# Strip the scheme again for the file name and hosts entry
+CLEAN_FILENAME="$BARE_DOMAIN"
+DOMAIN_CONFIG_PATH="$CONF_DIR/$CLEAN_FILENAME.caddy"
+
+# Raw domain for /etc/hosts mapping
+RAW_DOMAIN=$(printf '%s' "$CLEAN_FILENAME" | cut -d':' -f1)
+
+case "$COMMAND" in
+    add)
+        if [ -z "$DOMAIN" ] || [ -z "$TARGET" ]; then
+            echo "❌ Error: Missing domain or target."
+            show_usage
+        fi
+
+        if [[ "$TARGET" =~ ^[0-9]+$ ]]; then
+            TARGET="localhost:$TARGET"
+        fi
+
+        if [ ! -d "$CONF_DIR" ]; then
+            echo "📁 Creating drop-in directory at $CONF_DIR..."
+            sudo mkdir -p "$CONF_DIR"
+            sudo chmod 755 "$CONF_DIR"
+        fi
+
+        ensure_caddyfile_import
+
+        if [ -f "$DOMAIN_CONFIG_PATH" ]; then
+            echo "❌ Error: A configuration file already exists at $DOMAIN_CONFIG_PATH."
+            echo "💡 Use 'caddy-proxy update' instead."
+            exit 1
+        fi
+
+        printf "%s {\n    reverse_proxy %s\n}\n" "$DOMAIN" "$TARGET" \
+            | sudo tee "$DOMAIN_CONFIG_PATH" >/dev/null
+        sudo chmod 644 "$DOMAIN_CONFIG_PATH"
+        echo "📝 Created isolated config: $DOMAIN_CONFIG_PATH ➡️  $TARGET"
+
+        add_hosts_entry "$RAW_DOMAIN"
+
+        if ! reload_caddy; then
+            echo "⚠️  Rolling back config file because Caddy reload failed."
+            sudo rm -f "$DOMAIN_CONFIG_PATH"
+            exit 1
+        fi
+        ;;
+
+    update)
+        if [ -z "$DOMAIN" ] || [ -z "$TARGET" ]; then
+            echo "❌ Error: Missing domain or target."
+            show_usage
+        fi
+
+        if [ ! -f "$DOMAIN_CONFIG_PATH" ]; then
+            echo "❌ Error: No active configuration found for '$RAW_DOMAIN' at $DOMAIN_CONFIG_PATH."
+            exit 1
+        fi
+
+        if [[ "$TARGET" =~ ^[0-9]+$ ]]; then
+            TARGET="localhost:$TARGET"
+        fi
+
+        # Capture current state for rollback
+        old_target=$(awk '/reverse_proxy/ {print $2; exit}' "$DOMAIN_CONFIG_PATH")
+        old_site=$(grep -m1 -E '^[^#]*\{' "$DOMAIN_CONFIG_PATH" | sed -E 's/[[:space:]]*\{.*$//')
+
+        if [ -z "$old_target" ]; then
+            echo "❌ Error: Could not detect existing reverse_proxy target in $DOMAIN_CONFIG_PATH."
+            exit 1
+        fi
+
+        # Apply target change
+        escaped_target=$(escape_sed_replacement "$TARGET")
+        sudo sed -i -E "s|^([[:space:]]*reverse_proxy[[:space:]]+).*$|\1${escaped_target}|" "$DOMAIN_CONFIG_PATH"
+        echo "📝 Updated reverse_proxy target: $old_target ➡️  $TARGET"
+
+        # Force the site address back to http://<domain>
+        scheme_changed=0
+        if [ "$old_site" != "$DOMAIN" ]; then
+            scheme_changed=1
+            escaped_domain=$(escape_sed_replacement "$DOMAIN")
+            sudo sed -i -E "0,/^[^#]*\{/s|^[^#]*\{|${escaped_domain} {|" "$DOMAIN_CONFIG_PATH"
+            echo "📝 Updated site address: $old_site ➡️  $DOMAIN"
+        fi
+
+        if ! reload_caddy; then
+            echo "⚠️  Rolling back changes because Caddy reload failed."
+
+            escaped_old_target=$(escape_sed_replacement "$old_target")
+            sudo sed -i -E "s|^([[:space:]]*reverse_proxy[[:space:]]+).*$|\1${escaped_old_target}|" "$DOMAIN_CONFIG_PATH"
+
+            if [ "$scheme_changed" = "1" ]; then
+                escaped_old_site=$(escape_sed_replacement "$old_site")
+                sudo sed -i -E "0,/^[^#]*\{/s|^[^#]*\{|${escaped_old_site} {|" "$DOMAIN_CONFIG_PATH"
+            fi
+            exit 1
+        fi
+        ;;
+
+    remove)
+        if [ -z "$DOMAIN" ]; then
+            echo "❌ Error: Missing domain name to remove."
+            show_usage
+        fi
+
+        if [ ! -f "$DOMAIN_CONFIG_PATH" ] && ! hosts_contains_domain "$RAW_DOMAIN"; then
+            echo "❌ Error: Domain '$RAW_DOMAIN' not found in $CONF_DIR or hosts file."
+            exit 1
+        fi
+
+        if [ -f "$DOMAIN_CONFIG_PATH" ]; then
+            sudo rm "$DOMAIN_CONFIG_PATH"
+            echo "🗑️  Deleted configuration file: $DOMAIN_CONFIG_PATH"
+        fi
+
+        remove_hosts_entry "$RAW_DOMAIN"
+
+        reload_caddy
+        ;;
+
+    list)
+        echo "=== Active Isolated Caddy Proxies ==="
+
+        if [ ! -d "$CONF_DIR" ] || [ -z "$(ls -A "$CONF_DIR" 2>/dev/null)" ]; then
+            echo "No proxies found in $CONF_DIR."
+        else
+            shopt -s nullglob
+            for file in "$CONF_DIR"/*.caddy; do
+                domain_name=$(basename "$file" .caddy)
+                target_val=$(awk '/reverse_proxy/ {print $2; exit}' "$file")
+                echo "🌐 $domain_name  ➡️   $target_val"
+            done
+            shopt -u nullglob
+        fi
+
+        echo "====================================="
+        ;;
+
+    status)
+        echo "=== Caddy Service Status ==="
+        if command -v systemctl >/dev/null 2>&1; then
+            if systemctl is-active --quiet caddy; then
+                echo "  ✅ Service: active"
+            else
+                echo "  ❌ Service: inactive or failed"
+            fi
+            systemctl status caddy --no-pager -l 2>/dev/null | head -n 10 | sed 's/^/  /'
+        else
+            echo "  ⚠️  systemctl not available."
+        fi
+
+        echo ""
+        echo "=== Configuration Validation ==="
+        if command -v caddy >/dev/null 2>&1; then
+            if sudo caddy validate --config "$CADDYFILE_PATH" >/dev/null 2>&1; then
+                echo "  ✅ Configuration is valid."
+            else
+                echo "  ❌ Configuration validation failed."
+            fi
+        else
+            echo "  ⚠️  Caddy executable not found."
+        fi
+
+        echo ""
+        echo "=== Active Proxies ==="
+        if [ ! -d "$CONF_DIR" ] || [ -z "$(ls -A "$CONF_DIR" 2>/dev/null)" ]; then
+            echo "  No proxies found in $CONF_DIR."
+        else
+            shopt -s nullglob
+            for file in "$CONF_DIR"/*.caddy; do
+                domain_name=$(basename "$file" .caddy)
+                target_val=$(awk '/reverse_proxy/ {print $2; exit}' "$file")
+                echo "  🌐 $domain_name  ➡️   $target_val"
+            done
+            shopt -u nullglob
+        fi
+        ;;
+
+    doctor)
+        echo "=== Caddy Doctor ==="
+        echo ""
+
+        echo "[1] Caddy installation"
+        if command -v caddy >/dev/null 2>&1; then
+            echo "  ✅ caddy found: $(command -v caddy)"
+            caddy version 2>/dev/null | head -n 1 | sed 's/^/     /'
+        else
+            echo "  ❌ caddy not found in PATH."
+        fi
+        echo ""
+
+        echo "[2] Caddy systemd service"
+        if command -v systemctl >/dev/null 2>&1 && systemctl list-unit-files 2>/dev/null | grep -q '^caddy\.service'; then
+            echo "  ✅ caddy.service exists."
+            if systemctl is-active --quiet caddy; then
+                echo "  ✅ Service is active."
+            else
+                echo "  ⚠️  Service is not active."
+            fi
+        else
+            echo "  ⚠️  caddy.service not found."
+        fi
+        echo ""
+
+        echo "[3] Caddyfile and import line"
+        if [ -f "$CADDYFILE_PATH" ]; then
+            echo "  ✅ $CADDYFILE_PATH exists."
+            if sudo grep -qF "import ${CONF_DIR}/*" "$CADDYFILE_PATH"; then
+                echo "  ✅ Import line 'import ${CONF_DIR}/*' present."
+            else
+                echo "  ⚠️  Import line missing. Run 'caddy-proxy add ...' to add it automatically."
+            fi
+        else
+            echo "  ❌ $CADDYFILE_PATH not found."
+        fi
+        echo ""
+
+        echo "[4] Drop-in directory"
+        if [ -d "$CONF_DIR" ]; then
+            echo "  ✅ $CONF_DIR exists."
+            count=$(ls -1 "$CONF_DIR"/*.caddy 2>/dev/null | wc -l)
+            echo "  ℹ️  $count active config(s) found."
+        else
+            echo "  ⚠️  $CONF_DIR does not exist (created automatically on first add)."
+        fi
+        echo ""
+
+        echo "[5] /etc/hosts writability"
+        if [ -w "$HOSTS_FILE" ]; then
+            echo "  ✅ $HOSTS_FILE is directly writable."
+        elif sudo -n true 2>/dev/null && sudo test -w "$HOSTS_FILE"; then
+            echo "  ✅ $HOSTS_FILE is writable via passwordless sudo."
+        elif command -v sudo >/dev/null 2>&1; then
+            echo "  ✅ sudo available; writes will prompt for password if needed."
+        else
+            echo "  ❌ No write access and sudo is unavailable."
+        fi
+        echo ""
+
+        echo "[6] Local port conflict check"
+        if [ ! -d "$CONF_DIR" ] || [ -z "$(ls -A "$CONF_DIR" 2>/dev/null)" ]; then
+            echo "  ℹ️  No active proxies to check."
+        else
+            ports=$(awk '/reverse_proxy/ {print $2; exit}' "$CONF_DIR"/*.caddy 2>/dev/null \
+                    | sed -E 's/.*:([0-9]+)$/\1/' | sort -u)
+
+            if [ -z "$ports" ]; then
+                echo "  ℹ️  No port-based targets detected."
+            else
+                for p in $ports; do
+                    if command -v ss >/dev/null 2>&1; then
+                        if ss -tln 2>/dev/null | grep -qE "[:.]$p[[:space:]]"; then
+                            echo "  ✅ Port $p is listening."
+                        else
+                            echo "  ⚠️  Port $p is not listening (target may be down)."
+                        fi
+                    elif command -v netstat >/dev/null 2>&1; then
+                        if netstat -tln 2>/dev/null | grep -qE "[:.]$p[[:space:]]"; then
+                            echo "  ✅ Port $p is listening."
+                        else
+                            echo "  ⚠️  Port $p is not listening."
+                        fi
+                    else
+                        echo "  ⚠️  Cannot check port $p (ss/netstat not available)."
+                    fi
+                done
+            fi
+        fi
+        echo ""
+
+        echo "[7] Caddy config syntax"
+        if command -v caddy >/dev/null 2>&1 && [ -f "$CADDYFILE_PATH" ]; then
+            if sudo caddy validate --config "$CADDYFILE_PATH" >/dev/null 2>&1; then
+                echo "  ✅ Config is valid."
+            else
+                echo "  ❌ Config is invalid:"
+                sudo caddy validate --config "$CADDYFILE_PATH" 2>&1 | sed 's/^/     /'
+            fi
+        else
+            echo "  ⚠️  Cannot validate (caddy missing or Caddyfile absent)."
+        fi
+        echo ""
+
+        echo "=== Doctor complete ==="
+        ;;
+
+    help|--help|-h)
+        show_usage 0
+        ;;
+
+    "")
+        show_usage
+        ;;
+
+    *)
+        echo "❌ Error: Unknown command '$COMMAND'"
+        show_usage
+        ;;
+esac
