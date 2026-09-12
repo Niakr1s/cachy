@@ -26,8 +26,8 @@ Notes:
 
 Examples:
   caddy-proxy add app.local 3000            # creates http://app.local
-  caddy-proxy add app.local 4000            # updates target to localhost:4000
   caddy-proxy add http://app.local 3000     # same as above
+  caddy-proxy add app.local 4000            # updates target to localhost:4000
 EOF
 
     exit "$exit_code"
