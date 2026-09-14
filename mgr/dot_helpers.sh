@@ -28,14 +28,14 @@ command_exists() {
 apt_install() {
     local pkgs=($@)
     log_info "Installing: ${pkgs[*]}"
-    sudo pacman -S --needed --noconfirm "${pkgs[@]}"
+    shelly -Is --needed --no-confirm "${pkgs[@]}"
 }
 
 # Install one or more AUR packages
 aur_install() {
     local pkgs=($@)
     log_info "Installing: ${pkgs[*]}"
-    paru -S --needed --noconfirm "${pkgs[@]}"
+    shelly -Ia --needed --no-confirm "${pkgs[@]}"
 }
 
 # Install a Go package via go install
