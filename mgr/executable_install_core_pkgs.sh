@@ -3,7 +3,6 @@
 . $(dirname "$0")/.helpers.sh
 
 APT_PKGS=(
-    paru
     wl-clipboard
     neovim python-pynvim
     glow
