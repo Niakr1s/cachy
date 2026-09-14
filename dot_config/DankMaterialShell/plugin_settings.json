@@ -67,6 +67,6 @@
     "enabled": true,
     "dockerBinary": "podman",
     "terminalApp": "kitty",
-    "groupByCompose": false
+    "groupByCompose": true
   }
 }
