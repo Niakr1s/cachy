@@ -128,6 +128,7 @@ APT_PKGS=(
 AUR_PKGS=(
     lisgd
     throne-bin
+    portprotonqt
 )
 
 GO_PKGS=(
