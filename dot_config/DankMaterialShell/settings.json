@@ -60,7 +60,6 @@
   "spotlightSectionViewModes": {
     "apps": "list"
   },
-  "launcherStyle": "island",
   "iconThemeDark": "Adwaita",
   "cursorSettings": {
     "theme": "Adwaita",
@@ -170,7 +169,7 @@
         },
         {
           "id": "clipboard",
-          "enabled": true
+          "enabled": false
         },
         {
           "id": "battery",
@@ -221,7 +220,7 @@
       "islandOuterGap": 0,
       "islandAlongOffset": 0,
       "islandHomeCompactTight": false,
-      "islandNotificationExpand": false,
+      "islandNotificationExpand": true,
       "islandSatellitePosition": "edges",
       "islandInteractionMode": "click",
       "islandNotificationBadgeClearOnOpen": true,
