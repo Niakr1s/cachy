@@ -26,7 +26,6 @@ APT_PKGS=(
     rofi
     tealdeer
     pkgfile
-    vulkan-tools
     compsize
     lazygit
     mitmproxy
@@ -36,6 +35,7 @@ APT_PKGS=(
     gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly
     evtest
     yt-dlp
+    vulkan-tools
 
     # archive
     unarchiver zip unzip unrar lz4 7zip
@@ -117,12 +117,15 @@ APT_PKGS=(
     chromium
 
     # hardware
-    cpu-x vulkan-driver
+    cpu-x
     hardinfo2 apcupsd fwupd
     occt
 
     # games
-    goverlay mangohud gamescope gamemode
+    mangohud
+    gamescope
+    gamemode
+    steam
 )
 
 AUR_PKGS=(
