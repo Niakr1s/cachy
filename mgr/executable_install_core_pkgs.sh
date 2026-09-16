@@ -3,6 +3,7 @@
 . $(dirname "$0")/.helpers.sh
 
 APT_PKGS=(
+    cachy-chroot
     wl-clipboard
     neovim python-pynvim
     glow
