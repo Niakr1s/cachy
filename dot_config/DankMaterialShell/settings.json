@@ -149,12 +149,8 @@
       ],
       "rightWidgets": [
         {
-          "id": "networkIndicator",
-          "enabled": true
-        },
-        {
           "id": "network_speed_monitor",
-          "enabled": false
+          "enabled": true
         },
         {
           "id": "dockerManager",
