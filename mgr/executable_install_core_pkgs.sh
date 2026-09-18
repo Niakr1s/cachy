@@ -125,11 +125,14 @@ APT_PKGS=(
     hardinfo2 apcupsd fwupd
     occt
 
-    # games
+    # games stuff
     mangohud
     gamescope
     gamemode
     steam
+
+    # native games
+    luanti # minecraft like
 )
 
 AUR_PKGS=(
