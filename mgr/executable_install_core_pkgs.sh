@@ -38,6 +38,9 @@ APT_PKGS=(
     yt-dlp
     vulkan-tools
 
+    # pdf stuff
+    ghostscript poppler poppler-data
+
     # archive
     unarchiver zip unzip unrar lz4 7zip
 
