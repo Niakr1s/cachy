@@ -137,7 +137,7 @@ luksMountUmount "3b5448d2-3780-4cee-8529-caec12d1055e" "hdd20"
 luksMountUmount "fabfb454-6de2-412d-8bc7-b56a849c77c7" "hdd24"
 
 alias backup-etc="sudo borg create --progress $HOME/drives/hdd1/borg/etc::{now} /etc"
-alias backup-home="borg create --progress $HOME/drives/hdd1/borg/home::{now} $HOME --exclude '$HOME/.config/rpcs3/dev_hdd0/game/*' --exclude '$HOME/drives'"
+alias backup-home="sudo borg create --progress $HOME/drives/hdd1/borg/home::{now} $HOME --exclude '$HOME/.config/rpcs3/dev_hdd0/game/*' --exclude '$HOME/drives'"
 
 proxy-shell() {
     local p="http://127.0.0.1:2080"
