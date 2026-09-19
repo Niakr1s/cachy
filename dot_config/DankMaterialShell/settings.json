@@ -60,6 +60,7 @@
   "spotlightSectionViewModes": {
     "apps": "list"
   },
+  "niriOverviewOverlayEnabled": false,
   "iconThemeDark": "Adwaita",
   "cursorSettings": {
     "theme": "Adwaita",
