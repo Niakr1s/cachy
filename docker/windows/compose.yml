@@ -5,7 +5,7 @@ services:
     image: ghcr.io/dockur/windows:5.14
     container_name: windows
     environment:
-      RAM_SIZE: 6G
+      RAM_SIZE: 4G
       CPU_CORES: "8"
       DISK_SIZE: 32G
       USERNAME: bill
