@@ -3,6 +3,11 @@
   url = "https://github.com/boydaihungst/mediainfo.yazi"
   refreshPeriod = "168h"
 
+[".config/yazi/plugins/drag.yazi"]
+  type = "git-repo"
+  url = "https://github.com/Joao-Queiroga/drag.yazi"
+  refreshPeriod = "168h"
+
 [".config/yazi/plugins/toggle-pane.yazi/main.lua"]
   type = "file"
   url = "https://github.com/yazi-rs/plugins/raw/39aaf6dc77e546fe7f7836f102a6c57f96d15365/toggle-pane.yazi/main.lua"
