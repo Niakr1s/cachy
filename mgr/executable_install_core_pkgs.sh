@@ -37,6 +37,7 @@ APT_PKGS=(
     evtest
     yt-dlp
     vulkan-tools
+    lostfiles
 
     # pdf stuff
     ghostscript poppler poppler-data
@@ -58,6 +59,8 @@ APT_PKGS=(
     ydotool
 
     # fonts
+    noto-fonts-cjk
+    noto-fonts-emoji
     ttf-firacode-nerd
     ttf-iosevka-nerd
 
