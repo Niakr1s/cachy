@@ -31,6 +31,21 @@
         "visibilityInterval": 5,
         "id": "variant_1787903278430",
         "name": "wvkbd"
+      },
+      {
+        "icon": "keyboard",
+        "displayText": "",
+        "displayCommand": "",
+        "clickCommand": "busctl --user get-property sm.puri.OSK0 /sm/puri/OSK0 sm.puri.OSK0 Visible | grep -q true && busctl --user call sm.puri.OSK0 /sm/puri/OSK0 sm.puri.OSK0 SetVisible b false || busctl --user call sm.puri.OSK0 /sm/puri/OSK0 sm.puri.OSK0 SetVisible b true",
+        "middleClickCommand": "",
+        "rightClickCommand": "",
+        "updateInterval": 3,
+        "showIcon": true,
+        "showText": false,
+        "visibilityCommand": "pgrep squeekboard",
+        "visibilityInterval": 3,
+        "id": "variant_1790069040577",
+        "name": "squeekboard"
       }
     ]
   },

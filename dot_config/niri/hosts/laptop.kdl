@@ -2,7 +2,8 @@ spawn-sh-at-startup "sleep 2 && lisgd -v -d /dev/input/by-path/pci-0000:00:17.0-
 
 spawn-sh-at-startup "$HOME/.cargo/bin/iio-niri listen"
 
-spawn-sh-at-startup "wvkbd-mobintl -L 256 -l full,cyrillic --landscape-layers full,cyrillic --hidden"
+// spawn-sh-at-startup "wvkbd-mobintl -L 256 -l full,cyrillic --landscape-layers full,cyrillic --hidden"
+spawn-sh-at-startup "squeekboard"
 
 // TODO: changte to dms
 switch-events {

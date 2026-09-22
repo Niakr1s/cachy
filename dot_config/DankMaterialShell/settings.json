@@ -132,6 +132,10 @@
           "id": "launcherButton",
           "enabled": true
         },
+        {
+          "id": "dankActions:variant_1790069040577",
+          "enabled": true
+        },
         "workspaceSwitcher",
         "focusedWindow"
       ],
