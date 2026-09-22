@@ -157,23 +157,19 @@
           "id": "network_speed_monitor",
           "enabled": true
         },
-        {
-          "id": "dockerManager",
-          "enabled": true
-        },
-        "systemTray",
         "cpuUsage",
         "memUsage",
-        {
-          "id": "quickCapture",
-          "enabled": true
-        },
         {
           "id": "clipboard",
           "enabled": false
         },
         {
           "id": "battery",
+          "enabled": false
+        },
+        "systemTray",
+        {
+          "id": "dockerManager",
           "enabled": true
         },
         {
