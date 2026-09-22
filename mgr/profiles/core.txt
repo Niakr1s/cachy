@@ -4,6 +4,6 @@
 
 dms-shell
 core-packages
-set-groups
+groups
 caddy
 podman
