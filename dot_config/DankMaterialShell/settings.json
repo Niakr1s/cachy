@@ -133,6 +133,10 @@
           "enabled": true
         },
         {
+          "id": "dankActions:variant_1790078551230",
+          "enabled": true
+        },
+        {
           "id": "dankActions:variant_1790072590771",
           "enabled": true
         },
@@ -178,10 +182,6 @@
         "systemTray",
         {
           "id": "dockerManager",
-          "enabled": true
-        },
-        {
-          "id": "dankActions:variant_1790078551230",
           "enabled": true
         },
         {
