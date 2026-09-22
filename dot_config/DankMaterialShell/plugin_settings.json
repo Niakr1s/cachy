@@ -46,6 +46,36 @@
         "visibilityInterval": 3,
         "id": "variant_1790069040577",
         "name": "squeekboard"
+      },
+      {
+        "icon": "terminal",
+        "displayText": "terminal",
+        "displayCommand": "",
+        "clickCommand": "kitty &",
+        "middleClickCommand": "",
+        "rightClickCommand": "",
+        "updateInterval": 0,
+        "showIcon": true,
+        "showText": false,
+        "visibilityCommand": "",
+        "visibilityInterval": 0,
+        "id": "variant_1790072590771",
+        "name": "terminal"
+      },
+      {
+        "icon": "files",
+        "displayText": "",
+        "displayCommand": "",
+        "clickCommand": "nautilus &",
+        "middleClickCommand": "",
+        "rightClickCommand": "",
+        "updateInterval": 0,
+        "showIcon": true,
+        "showText": false,
+        "visibilityCommand": "",
+        "visibilityInterval": 0,
+        "id": "variant_1790072762834",
+        "name": "fm"
       }
     ]
   },
