@@ -181,6 +181,10 @@
           "enabled": true
         },
         {
+          "id": "dankActions:variant_1790078551230",
+          "enabled": true
+        },
+        {
           "id": "notificationButton",
           "enabled": true
         },

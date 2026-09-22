@@ -20,3 +20,4 @@ sudo ln -sf "$SRC" "$DST"
 log_info "Enabling the service..."
 sudo systemctl enable --now awg-quick@wg0.service
 
+echo "$USER ALL=(ALL) NOPASSWD: /bin/systemctl start awg-quick@wg0.service, /bin/systemctl stop awg-quick@wg0.service, /bin/systemctl status awg-quick@wg0.service, /bin/systemctl is-active awg-quick@wg0.service" | sudo tee /etc/sudoers.d/amneziawg > /dev/null && sudo chmod 0440 /etc/sudoers.d/amneziawg

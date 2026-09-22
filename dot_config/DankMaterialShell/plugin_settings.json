@@ -76,6 +76,21 @@
         "visibilityInterval": 0,
         "id": "variant_1790072762834",
         "name": "fm"
+      },
+      {
+        "icon": "terminal",
+        "displayText": "",
+        "displayCommand": "sudo systemctl is-active awg-quick@wg0.service &>/dev/null && printf \"\\033[32m\\uf023\\033[0m\\n\" || printf \"\\033[31m\\uf023\\033[0m\\n\"",
+        "clickCommand": "systemctl is-active --quiet awg-quick@wg0.service && sudo systemctl stop awg-quick@wg0.service || sudo systemctl start awg-quick@wg0.service",
+        "middleClickCommand": "",
+        "rightClickCommand": "",
+        "updateInterval": 3,
+        "showIcon": false,
+        "showText": true,
+        "visibilityCommand": "",
+        "visibilityInterval": 0,
+        "id": "variant_1790078551230",
+        "name": "vpn"
       }
     ]
   },
