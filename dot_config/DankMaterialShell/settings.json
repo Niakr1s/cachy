@@ -45,7 +45,7 @@
       "width": 50
     },
     {
-      "id": "darkMode",
+      "id": "idleInhibitor",
       "enabled": true,
       "width": 50
     }
