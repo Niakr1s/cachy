@@ -31,7 +31,9 @@
       "mcp/sequential-thinking:*",
       "mcp/fetch:*",
       "mcp/time:get_current_time",
-      "mcp/time:*"
+      "mcp/time:*",
+      "mcp/filesystem:*",
+      "mcp/git:*"
     ],
     "showChatUtilityMenuLabels": true,
     "pinnedPlugins": [],

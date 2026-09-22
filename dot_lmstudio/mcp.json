@@ -37,7 +37,9 @@
       "command": "npx",
       "args": [
         "-y",
-        "@modelcontextprotocol/server-filesystem"
+        "@modelcontextprotocol/server-filesystem",
+        "/home/user/Projects",
+        "/home/user/mgr"
       ]
     },
     "sequential-thinking": {
