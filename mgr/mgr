@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+# mgr — apply a machine profile or run individual tasks from this repo.
+#
+#   ./mgr desktop            run every task in profiles/desktop.txt, in order
+#   ./mgr laptop             run every task in profiles/laptop.txt, in order
+#   ./mgr hibernation off    run a single task (tasks/hibernation.sh) with args
+#
+# Profile files may pull in other profiles with "%include <name>" lines,
+# e.g. desktop.txt starts with "%include core" to install the base layer first.
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TASKS_DIR="$ROOT/tasks"
+PROFILES_DIR="$ROOT/profiles"
+declare -A LOADED_PROFILES=()   # guards against circular %include chains
+
+list_profiles() { ls "$PROFILES_DIR" 2>/dev/null | sed 's/\.txt$//'; }
+list_tasks()    { ls "$TASKS_DIR"    | sed 's/\.sh$//'; }
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") <profile>           Run all tasks for a machine (profiles/<name>.txt)
+       $(basename "$0") <task> [args...]    Run a single task (tasks/<name>.sh)
+
+Profiles:  $(list_profiles | tr '\n' ' ')
+Tasks:     $(list_tasks | tr '\n' ' ')
+EOF
+}
+
+run_task() {
+  local name="$1"; shift
+  local task_file="$TASKS_DIR/$name.sh"
+  [[ -f "$task_file" ]] || { echo "ERROR: unknown task '$name'" >&2; exit 1; }
+  echo ""
+  echo "==> running task: $name $*"
+  "$task_file" "$@"
+}
+
+run_profile() {
+  local name="$1"
+  local profile_file="$PROFILES_DIR/$name.txt"
+  [[ -f "$profile_file" ]] || {
+    echo "ERROR: unknown profile '$name' (available: $(list_profiles | tr '\n' ' '))" >&2
+    exit 1
+  }
+  if [[ -n "${LOADED_PROFILES[$name]:-}" ]]; then
+    echo "ERROR: circular include of profile '$name'" >&2
+    exit 1
+  fi
+  LOADED_PROFILES["$name"]=1
+
+  echo "Applying profile '$name'"
+  local line task args inc
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    line="${line%%#*}"                            # strip comments
+    line="${line#"${line%%[![:space:]]*}"}"       # trim leading whitespace
+    line="${line%"${line##*[![:space:]]}"}"        # trim trailing whitespace
+    [[ -z "$line" ]] && continue                  # skip blank lines
+
+    if [[ "$line" == %* ]]; then                  # directive, e.g. "%include core"
+      [[ "$line" =~ ^%include[[:space:]]+([^[:space:]]+) ]] || {
+        echo "ERROR: bad directive in profile '$name': $line (expected '%include <profile>')" >&2
+        exit 1
+      }
+      inc="${BASH_REMATCH[1]%%.txt}"
+      run_profile "$inc"
+      continue
+    fi
+
+    task="${line%% *}"
+    args="${line#"$task"}"
+    run_task "$task" $args                        # word-splitting of args is intentional
+  done < "$profile_file"
+}
+
+main() {
+  local cmd="${1:-help}"
+  case "$cmd" in
+    -h|--help|help) usage ;;
+    *)
+      if [[ -f "$PROFILES_DIR/$cmd.txt" ]]; then
+        run_profile "$cmd"
+      elif [[ -f "$TASKS_DIR/$cmd.sh" ]]; then
+        shift
+        run_task "$cmd" "$@"
+      else
+        echo "ERROR: unknown profile or task '$cmd'" >&2
+        usage >&2
+        exit 1
+      fi
+      ;;
+  esac
+}
+
+main "$@"

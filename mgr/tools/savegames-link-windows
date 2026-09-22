@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+usage() {
+  cat <<EOF
+
+Description:
+  Links a steamuser directory to a directory in a wine prefix so it can be used to store savegames in one place.
+  Old steamuser directory will be backuped next to the old one inside the prefix.
+  Default directory can be configured via SAVEGAMES_DIR env variable.
+
+Usage:
+  $0 <prefix>
+EOF
+}
+
+# Validate SAVEGAMES_DIR
+SAVEGAMES_DIR="${SAVEGAMES_DIR:-$HOME/.savegames/windows}"
+if [[ ! -d "$SAVEGAMES_DIR" ]]; then
+  echo "ERROR: directory $SAVEGAMES_DIR doesn't exist" >&2
+  exit 1
+fi
+
+# Check arguments
+if [[ "$#" -ne 1 ]]; then
+  echo "ERROR: Wrong argument count" >&2
+  usage
+  exit 1
+fi
+PREFIX_DIR="$1"
+
+# Validate prefix directory exists
+if [[ ! -d "$PREFIX_DIR" ]]; then
+  echo "ERROR: Wine prefix directory $PREFIX_DIR doesn't exist" >&2
+  exit 1
+fi
+
+# Validate it's a Wine prefix (check for drive_c)
+if [[ ! -d "$PREFIX_DIR/drive_c" ]]; then
+  echo "ERROR: $PREFIX_DIR doesn't appear to be a valid Wine prefix (missing drive_c)" >&2
+  exit 1
+fi
+
+backup_and_make_link() {
+  local from="$1"
+  local from_bak_dir="$from.bak"
+  local to="$2"
+
+  # Remove old symlink if it exists
+  if [[ -L "$from" ]]; then
+    echo "Removing old symlink"
+    rm -f "$from"
+  else
+    # Handle existing directory
+    if [[ -d "$from" ]]; then
+      # Check if backup already exists
+      if [[ -d "$from_bak_dir" ]]; then
+        echo "WARNING: Backup directory $from_bak_dir already exists" >&2
+        read -p "Remove existing backup? (y/N) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+          rm -rf "$from_bak_dir"
+        else
+          echo "Aborting to prevent data loss" >&2
+          exit 1
+        fi
+      fi
+      
+      echo "Moving existing $from directory to $from_bak_dir"
+      mv "$from" "$from_bak_dir"
+    fi
+  fi
+
+  # Create symlink
+  echo "Creating symlink from $from to $to"
+  ln -s "$to" "$from"
+
+  echo "Successfully linked $from to $to"
+}
+
+PREFIX_USERS_DIR="$PREFIX_DIR/drive_c/users"
+
+backup_and_make_link "$PREFIX_USERS_DIR/$USER" "$SAVEGAMES_DIR"
+backup_and_make_link "$PREFIX_USERS_DIR/steamuser" "$SAVEGAMES_DIR"

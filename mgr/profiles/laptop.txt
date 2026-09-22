@@ -1,0 +1,4 @@
+# Laptop — lightweight setup (Intel GPU, mostly for watching movies).
+# Starts from the shared 'core' profile, then adds laptop-only tasks.
+
+%include core

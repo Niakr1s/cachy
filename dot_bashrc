@@ -16,8 +16,8 @@ PATH_ADDITIONS=(
     "$HOME/go/bin"
     "$HOME/.cargo/bin"
     "$HOME/.asdf/shims"
-    "$HOME/mgr"
-    "$HOME/mgr/tools"
+    "$HOME/.local/share/chezmoi/mgr"
+    "$HOME/.local/share/chezmoi/mgr/tools"
 )
 export PATH="$PATH:$(IFS=:; echo "${PATH_ADDITIONS[*]}")"
 

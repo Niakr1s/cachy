@@ -1,0 +1,9 @@
+# Core — base layer shared by every machine profile.
+# Other profiles start with "%include core" to pull these in first.
+# (Also runnable on its own: ./mgr core)
+
+dms-shell
+core-packages
+set-groups
+caddy
+podman

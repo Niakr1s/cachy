@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+
+# Core package set shared by both machines (desktop & laptop).
+# Desktop-only heavy stuff lives in the other tasks (see profiles/).
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../lib/helpers.sh"
+
+APT_PKGS=(
+    cachy-chroot
+    wl-clipboard
+    neovim python-pynvim
+    glow
+    nvtop
+    yazi
+    borgbackup python-pyfuse3
+    zoxide
+    chezmoi
+    direnv
+    eza
+    fzf
+    tree
+    bottom
+    duf
+    gdu
+    playerctl
+    aria2
+    xclip
+    mediainfo
+    ripgrep
+    rofi
+    tealdeer
+    pkgfile
+    compsize
+    lazygit
+    mitmproxy
+    jp2a
+    imagemagick
+    gpu-viewer
+    gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly
+    evtest
+    yt-dlp
+    vulkan-tools
+    lostfiles
+
+    # pdf stuff
+    ghostscript poppler poppler-data
+
+    # archive
+    unarchiver zip unzip unrar lz4 7zip
+
+    # libs
+    # needed for joystickwake
+    python-pyudev
+    python-dbus-fast
+    python-xlib
+    fuse2
+
+    # deps
+    ddcutil
+    i2c-tools
+    wtype
+    ydotool
+
+    # fonts
+    noto-fonts-cjk
+    noto-fonts-emoji
+    ttf-firacode-nerd
+    ttf-iosevka-nerd
+
+    # services
+    xdg-desktop-portal-gnome
+    xdg-desktop-portal-wlr
+    syncthing
+    caddy mkcert
+
+    # programming
+    cmake ninja
+    uv
+    go
+    nodejs npm deno
+    cargo lldb
+    ruby tk ruby-stdlib
+
+    # theming
+    qt5ct
+    qt6ct
+    adw-gtk-theme
+
+    # gui
+    gimp inkscape
+    libreoffice
+    librecad
+    mission-center
+    gthumb
+    qbittorrent
+    nautilus
+    sqlitebrowser
+    foliate
+    weechat
+    gnome-text-editor
+    gnome-disk-utility
+    keepassxc
+    dconf-editor
+    remmina
+    kitty
+    handbrake
+    strawberry
+    kdeconnect
+    kid3
+    zed
+    strawberry
+    mpv
+    telegram-desktop
+    moonlight-qt
+    obsidian
+    sunshine
+    obs-studio-browser # cachyos's obs-studio
+    gpu-screen-recorder
+    kdenlive
+    squeekboard
+
+    # browsers
+    firefox
+    chromium
+
+    # hardware
+    cpu-x
+    hardinfo2 apcupsd fwupd
+    occt
+
+    # games stuff
+    mangohud
+    gamescope
+    gamemode
+    steam
+
+    # native games
+    luanti # minecraft like
+)
+
+AUR_PKGS=(
+    lisgd
+    throne-bin
+    portprotonqt
+    iio-niri
+)
+
+GO_PKGS=(
+    github.com/jorgerojas26/lazysql@latest
+    github.com/asdf-vm/asdf/cmd/asdf@v0.20.0
+)
+
+CARGO_PKGS=(
+    ripdrag
+)
+
+AM_PKGS=(
+    lossless-cut
+    crossmacro
+)
+
+pkg_install "${APT_PKGS[@]}"
+aur_install "${AUR_PKGS[@]}"
+go_install "${GO_PKGS[@]}"
+cargo_install "${CARGO_PKGS[@]}"
+am_install "${AM_PKGS[@]}"
+
+sudo pkgfile --update # don't know where to put it, but don't want to forget
