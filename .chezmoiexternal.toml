@@ -21,4 +21,4 @@
 ["mgr"]
     type = "git-repo"
     url = "git@github.com:Niakr1s/mgr.git"
-    refreshPeriod = "168h"
+    refreshPeriod = "1h"
