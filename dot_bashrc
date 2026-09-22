@@ -77,6 +77,7 @@ alias cze="chezmoi edit"
 alias czd="chezmoi diff"
 alias czs="chezmoi status"
 alias czm="chezmoi merge-all"
+alias czu="chezmoi update"
 
 # Git
 alias gst="git status"
