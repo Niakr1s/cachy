@@ -92,6 +92,7 @@ APT_PKGS=(
     librecad
     mission-center
     gthumb
+    imv # small image viewer
     qbittorrent
     nautilus
     sqlitebrowser
