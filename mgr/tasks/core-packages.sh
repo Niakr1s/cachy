@@ -151,7 +151,6 @@ GO_PKGS=(
 )
 
 CARGO_PKGS=(
-    ripdrag
 )
 
 AM_PKGS=(
