@@ -41,6 +41,7 @@ APT_PKGS=(
     yt-dlp
     vulkan-tools
     lostfiles
+    joyutils # jscal, jstest and jsattach utilities for the Linux joystick driver
 
     # pdf stuff
     ghostscript poppler poppler-data
