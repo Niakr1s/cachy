@@ -27,8 +27,3 @@ desc = "Maximize or restore the preview pane"
 on   = [ "M" ]
 run  = "plugin mediainfo -- toggle-metadata"
 desc = "Toggle media preview metadata"
-
-[[mgr.prepend_keymap]]
-on   = [ "<C-g>" ]
-run  = "plugin drag"
-desc = "Drag Files"
