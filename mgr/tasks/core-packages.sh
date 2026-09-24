@@ -88,12 +88,10 @@ APT_PKGS=(
     adw-gtk-theme
 
     # gui
-    gimp inkscape
+    gimp inkscape imv viu
     libreoffice
     librecad
     mission-center
-    gthumb
-    imv # small image viewer
     qbittorrent
     nautilus
     sqlitebrowser

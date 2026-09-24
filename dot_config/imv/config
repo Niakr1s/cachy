@@ -1,0 +1,42 @@
+[options]
+title_text = "$imv_current_file"
+
+overlay = true
+overlay_font = Iosevka:10
+overlay_position_bottom = true
+overlay_text = "[$imv_current_index/$imv_file_count] - $imv_current_file - (${imv_width}x${imv_height})"
+
+suppress_default_binds = true
+
+# Keybindings.
+[binds]
+q = quit
+x = close
+p = exec echo $imv_current_file
+e = exec gimp "$imv_current_file" &
+
+t = slideshow +1
+<Shift+T> = slideshow -1
+
+gg = goto 1
+<Shift+G> = goto -1
+
+h = prev 1
+j = zoom 5
+k = zoom -5
+l = next 1
+
+<Left> = prev
+<bracketleft> = prev
+<Right> = next
+<bracketright> = next
+
+<Shift+H> = pan -100 0
+<Shift+J> = pan 0 100
+<Shift+K> = pan 0 -100
+<Shift+L> = pan 100 0
+
+<Ctrl+h> = rotate by -90
+<Ctrl+j> = flip vertical
+<Ctrl+k> = flip horizontal
+<Ctrl+l> = rotate by 90
