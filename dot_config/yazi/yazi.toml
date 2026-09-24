@@ -27,7 +27,7 @@ prepend_previewers = [
 [opener]
 custom = [
   { run = "dms open %s", desc = "open", for = "linux", orphan = true },
-  { run = "imv %s", desc = "imv", for = "linux", orphan = true },
+  { run = "viewnior %s", desc = "viewnior", for = "linux", orphan = true },
   { run = "unar %s", desc = "extract", for = "linux", orphan = false, block = true },
   { run = "chezmoi add %s", desc = "chezmoi", for = "linux" },
   { run = "nautilus --select %s", desc = "nautilus", for = "linux", orphan = true },

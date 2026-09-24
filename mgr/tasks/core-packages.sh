@@ -88,7 +88,8 @@ APT_PKGS=(
     adw-gtk-theme
 
     # gui
-    gimp inkscape imv viu
+    viewnior
+    gimp inkscape
     libreoffice
     librecad
     mission-center
