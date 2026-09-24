@@ -102,8 +102,7 @@
   },
   "commandRunner": {
     "enabled": true,
-    "history": [
-    ]
+    "history": []
   },
   "calculator": {
     "enabled": true,
