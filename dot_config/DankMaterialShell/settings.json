@@ -179,6 +179,10 @@
           "id": "battery",
           "enabled": false
         },
+        {
+          "id": "volumeMixer",
+          "enabled": true
+        },
         "systemTray",
         {
           "id": "dockerManager",
@@ -236,7 +240,7 @@
       "islandHomeLayout": [
         {
           "id": "volume",
-          "enabled": true
+          "enabled": false
         },
         {
           "id": "clock",

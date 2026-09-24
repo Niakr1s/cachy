@@ -22,6 +22,10 @@
       "repo": "https://github.com/devnullvoid/dms-emoji-launcher",
       "commit": "8ff394e3ddfcb2fd755ed2e7b4c6f01f3e26e596"
     },
+    "volumeMixer": {
+      "repo": "https://github.com/cwelsys/dms-volume-mixer",
+      "commit": "353e00b659a16df07105b16c8790e6b526743471"
+    },
     "wallpaperCarousel": {
       "repo": "https://github.com/motor-dev/wallpaperCarousel",
       "commit": "761ecd1b7f347beee9f17909f8334d987c935a1a"

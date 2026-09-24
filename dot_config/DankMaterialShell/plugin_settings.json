@@ -128,5 +128,8 @@
     "dockerBinary": "podman",
     "terminalApp": "kitty",
     "groupByCompose": true
+  },
+  "volumeMixer": {
+    "enabled": true
   }
 }
