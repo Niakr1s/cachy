@@ -13,7 +13,7 @@ suppress_default_binds = true
 q = quit
 x = close
 p = exec echo $imv_current_file
-e = exec gimp "$imv_current_file" &
+e = exec krita "$imv_current_file" &
 
 t = slideshow +1
 <Shift+T> = slideshow -1
