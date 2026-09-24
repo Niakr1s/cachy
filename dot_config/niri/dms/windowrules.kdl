@@ -21,7 +21,7 @@ window-rule {
 
 // @id=wr_1787936443357463586 @name=org.gnome.Nautilus
 window-rule {
-    match app-id="^org.gnome.Nautilus$" title="^(Open|Save|Pick)"
+    match app-id="^org.gnome.Nautilus$" title="^(Open|Save|Pick|l3afpad - Save As)"
     open-floating true
     min-width 1024
     max-width 1024

@@ -99,7 +99,7 @@ APT_PKGS=(
     sqlitebrowser
     foliate
     weechat
-    gnome-text-editor
+    l3afpad
     gnome-disk-utility
     keepassxc
     dconf-editor
