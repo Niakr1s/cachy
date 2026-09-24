@@ -148,6 +148,12 @@
           "id": "dankActions:variant_1790069040577",
           "enabled": true
         },
+        {
+          "id": "keyboard_layout_name",
+          "enabled": true,
+          "keyboardLayoutNameShowIcon": false,
+          "keyboardLayoutNameCompactMode": true
+        },
         "workspaceSwitcher",
         "focusedWindow"
       ],
