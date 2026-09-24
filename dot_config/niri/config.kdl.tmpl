@@ -12,6 +12,12 @@ gestures {
     }
 }
 
+switch-events {
+    lid-close {
+        spawn "dms" "ipc" "call" "lock" "lock";
+    }
+}
+
 input {
     keyboard {
         xkb {
