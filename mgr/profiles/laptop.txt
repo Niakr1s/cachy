@@ -2,3 +2,4 @@
 # Starts from the shared 'core' profile, then adds laptop-only tasks.
 
 %include core
+hibernation off
