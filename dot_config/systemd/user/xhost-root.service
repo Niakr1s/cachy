@@ -1,0 +1,11 @@
+[Unit]
+Description=Allow root X access for GameConqueror
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/xhost +si:localuser:root
+; Environment=DISPLAY=:0
+
+[Install]
+WantedBy=graphical-session.target

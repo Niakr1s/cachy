@@ -42,6 +42,7 @@ APT_PKGS=(
     vulkan-tools
     lostfiles
     joyutils # jscal, jstest and jsattach utilities for the Linux joystick driver
+    xorg-xhost # fix for gameconqueror: xhost +local:
 
     # pdf stuff
     ghostscript poppler poppler-data
