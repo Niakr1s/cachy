@@ -135,6 +135,8 @@ APT_PKGS=(
     gamescope
     gamemode
     steam
+    scanmem # cheat engine alternative
+    gameconqueror # doesn't work though
 
     # native games
     luanti # minecraft like
