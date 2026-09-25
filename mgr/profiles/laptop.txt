@@ -3,3 +3,4 @@
 
 %include core
 hibernation off
+disable-power-button
