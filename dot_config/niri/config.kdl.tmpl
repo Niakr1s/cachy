@@ -12,6 +12,12 @@ gestures {
     }
 }
 
+switch-events {
+    lid-close {
+        spawn "dms" "ipc" "call" "lock" "lock";
+    }
+}
+
 input {
     keyboard {
         xkb {
@@ -62,6 +68,8 @@ input {
     // Focus windows and outputs automatically when moving the mouse into them.
     // Setting max-scroll-amount="0%" makes it work only on windows already fully on screen.
     focus-follows-mouse max-scroll-amount="0%"
+
+    disable-power-key-handling
 }
 
 layout {
