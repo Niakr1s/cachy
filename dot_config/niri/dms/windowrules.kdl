@@ -53,3 +53,9 @@ window-rule {
     match app-id="^com.danklinux.dms$"
     open-floating true
 }
+
+// @id=wr_1790740229998646441 @name=Wine Tray
+window-rule {
+    match app-id="^explorer.exe$"
+    open-floating false
+}
