@@ -142,9 +142,8 @@ APT_PKGS=(
 )
 
 AUR_PKGS=(
-    lisgd
+    lisgd iio-niri
     portprotonqt
-    iio-niri
 )
 
 GO_PKGS=(
