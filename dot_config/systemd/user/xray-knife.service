@@ -1,0 +1,13 @@
+[Unit]
+Description=Xray Knife Proxy System
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/home/user/go/bin/xray-knife proxy system --insecure
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
