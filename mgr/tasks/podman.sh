@@ -8,3 +8,5 @@ pkg_install podman podman-docker podman-compose podman-desktop podlet
 
 sudo mkdir -p /etc/containers/registries.conf.d
 echo 'unqualified-search-registries = ["docker.io"]' | sudo tee /etc/containers/registries.conf.d/10-unqualified-search-registries.conf > /dev/null
+
+loginctl enable-linger $USER
