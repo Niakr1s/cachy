@@ -143,7 +143,7 @@ alias backup-etc="sudo borg create --progress $HOME/drives/hdd1/borg/etc::{now} 
 alias backup-home="sudo borg create --progress $HOME/drives/hdd1/borg/home::{now} $HOME --exclude '$HOME/.config/rpcs3/dev_hdd0/game/*' --exclude '$HOME/drives'"
 
 proxy-shell() {
-    local p="http://127.0.0.1:2080"
+    local p="http://127.0.0.1:9999"
     echo "On: $p"
     http_proxy="$p" https_proxy="$p" HTTP_PROXY="$p" HTTPS_PROXY="$p" $SHELL
     echo "Off: $p"
