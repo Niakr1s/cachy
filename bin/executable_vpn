@@ -4,6 +4,32 @@ set -euo pipefail
 WG_SERVICE="awg-quick@wg0.service"
 XRAY_SERVICE="xray-knife.service"
 
+# ANSI colors
+RED=$'\033[31m'
+GREEN=$'\033[32m'
+RESET=$'\033[0m'
+
+usage() {
+    cat <<'EOF'
+Usage: vpn <command>
+
+Commands:
+  cycle                     Cycle state: off → wg → xray → off
+  off                       Stop all VPN services
+  wg                        Switch to WireGuard (awg-quick@wg0)
+  xray                      Switch to Xray (xray-knife)
+  status                    Print current state: off | wg | xray
+  status --full             Print full systemctl status of active service
+  status -s                 Print symbol: ⓞ | ⓦ | ⓧ
+                            (alias: --symbol)
+  status -cs                Print colored symbol (red=off, green=on)
+                            (alias: --coloredsymbol)
+  help, -h, --help          Show this help
+
+Run with no arguments to print this usage.
+EOF
+}
+
 get_status() {
     if systemctl is-active --quiet "$WG_SERVICE"; then
         echo "wg"
@@ -12,6 +38,23 @@ get_status() {
     else
         echo "off"
     fi
+}
+
+get_symbol() {
+    case "$(get_status)" in
+        off)  echo "ⓞ" ;;   # U+24DE
+        wg)   echo "ⓦ" ;;   # U+24E6
+        xray) echo "ⓧ" ;;   # U+24E7
+    esac
+}
+
+get_symbol_colored() {
+    local s
+    s="$(get_status)"
+    case "$s" in
+        off)     printf '%s%s%s\n' "$RED"   "$(get_symbol)" "$RESET" ;;
+        wg|xray) printf '%s%s%s\n' "$GREEN" "$(get_symbol)" "$RESET" ;;
+    esac
 }
 
 status_full() {
@@ -43,7 +86,6 @@ status_full() {
 }
 
 wait_inactive() {
-    # $1 = "system" or "user", $2 = service name
     local scope="$1" svc="$2" i
     for i in $(seq 1 30); do
         if [[ "$scope" == "user" ]]; then
@@ -67,52 +109,88 @@ stop_xray() {
     wait_inactive user "$XRAY_SERVICE" || true
 }
 
-start_wg() {
+do_off() {
+    stop_wg
+    stop_xray
+}
+
+do_wg() {
+    stop_xray
     sudo systemctl start "$WG_SERVICE"
+    if systemctl --user is-active --quiet "$XRAY_SERVICE"; then
+        stop_xray
+    fi
 }
 
-start_xray() {
+do_xray() {
+    stop_wg
     systemctl --user start "$XRAY_SERVICE"
+    if systemctl is-active --quiet "$WG_SERVICE"; then
+        stop_wg
+    fi
 }
 
-case "${1:-status}" in
-    off)
-        stop_wg
-        stop_xray
-        ;;
-    wg)
-        # Ensure xray is fully stopped before starting wg
-        stop_xray
-        start_wg
-        # Belt-and-braces: if xray somehow came back up, kill it again
-        if systemctl --user is-active --quiet "$XRAY_SERVICE"; then
-            stop_xray
-        fi
-        ;;
-    xray)
-        # Ensure wg is fully stopped before starting xray
-        stop_wg
-        start_xray
-        if systemctl is-active --quiet "$WG_SERVICE"; then
-            stop_wg
-        fi
-        ;;
-    status)
-        case "${2:-}" in
-            "")
-                get_status
-                ;;
-            --full)
-                status_full
-                ;;
+do_cycle() {
+    case "$(get_status)" in
+        off)  do_wg ;;
+        wg)   do_xray ;;
+        xray) do_off ;;
+    esac
+}
+
+status_cmd() {
+    local symbol=0 colored_symbol=0 full=0
+    shift  # drop "status"
+
+    for arg in "$@"; do
+        case "$arg" in
+            -s|--symbol)          symbol=1 ;;
+            -cs|--coloredsymbol)  colored_symbol=1 ;;
+            --full)               full=1 ;;
             *)
-                echo "Usage: vpn status [--full]" >&2
+                echo "vpn: unknown option for 'status': $arg" >&2
+                usage >&2
                 exit 1
                 ;;
         esac
+    done
+
+    if (( full )); then
+        status_full
+    elif (( colored_symbol )); then
+        get_symbol_colored
+    elif (( symbol )); then
+        get_symbol
+    else
+        get_status
+    fi
+}
+
+case "${1:-}" in
+    "")
+        usage
+        ;;
+    help|-h|--help)
+        usage
+        ;;
+    cycle)
+        do_cycle
+        ;;
+    off)
+        do_off
+        ;;
+    wg)
+        do_wg
+        ;;
+    xray)
+        do_xray
+        ;;
+    status)
+        status_cmd "$@"
         ;;
     *)
-        echo "Usage: vpn {off|wg|xray|status [--full]}" >&2
+        echo "vpn: unknown command: $1" >&2
+        usage >&2
         exit 1
         ;;
 esac
