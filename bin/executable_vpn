@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+WG_SERVICE="awg-quick@wg0.service"
+XRAY_SERVICE="xray-knife.service"
+
+get_status() {
+    if systemctl is-active --quiet "$WG_SERVICE"; then
+        echo "wg"
+    elif systemctl --user is-active --quiet "$XRAY_SERVICE"; then
+        echo "xray"
+    else
+        echo "off"
+    fi
+}
+
+status_full() {
+    local cur
+    cur="$(get_status)"
+
+    case "$cur" in
+        off)
+            echo "off"
+            return 0
+            ;;
+        wg)
+            echo "=== $WG_SERVICE (system) ==="
+            if systemctl list-unit-files --no-legend "$WG_SERVICE" 2>/dev/null | grep -q .; then
+                systemctl status -l "$WG_SERVICE" --no-pager || true
+            else
+                echo "unit not found"
+            fi
+            ;;
+        xray)
+            echo "=== $XRAY_SERVICE (user) ==="
+            if systemctl --user list-unit-files --no-legend "$XRAY_SERVICE" 2>/dev/null | grep -q .; then
+                systemctl --user status -l "$XRAY_SERVICE" --no-pager || true
+            else
+                echo "unit not found"
+            fi
+            ;;
+    esac
+}
+
+wait_inactive() {
+    # $1 = "system" or "user", $2 = service name
+    local scope="$1" svc="$2" i
+    for i in $(seq 1 30); do
+        if [[ "$scope" == "user" ]]; then
+            systemctl --user is-active --quiet "$svc" || return 0
+        else
+            systemctl is-active --quiet "$svc" || return 0
+        fi
+        sleep 0.1
+    done
+    echo "warning: $svc did not become inactive" >&2
+    return 1
+}
+
+stop_wg() {
+    sudo systemctl stop "$WG_SERVICE" 2>/dev/null || true
+    wait_inactive system "$WG_SERVICE" || true
+}
+
+stop_xray() {
+    systemctl --user stop "$XRAY_SERVICE" 2>/dev/null || true
+    wait_inactive user "$XRAY_SERVICE" || true
+}
+
+start_wg() {
+    sudo systemctl start "$WG_SERVICE"
+}
+
+start_xray() {
+    systemctl --user start "$XRAY_SERVICE"
+}
+
+case "${1:-status}" in
+    off)
+        stop_wg
+        stop_xray
+        ;;
+    wg)
+        # Ensure xray is fully stopped before starting wg
+        stop_xray
+        start_wg
+        # Belt-and-braces: if xray somehow came back up, kill it again
+        if systemctl --user is-active --quiet "$XRAY_SERVICE"; then
+            stop_xray
+        fi
+        ;;
+    xray)
+        # Ensure wg is fully stopped before starting xray
+        stop_wg
+        start_xray
+        if systemctl is-active --quiet "$WG_SERVICE"; then
+            stop_wg
+        fi
+        ;;
+    status)
+        case "${2:-}" in
+            "")
+                get_status
+                ;;
+            --full)
+                status_full
+                ;;
+            *)
+                echo "Usage: vpn status [--full]" >&2
+                exit 1
+                ;;
+        esac
+        ;;
+    *)
+        echo "Usage: vpn {off|wg|xray|status [--full]}" >&2
+        exit 1
+        ;;
+esac
