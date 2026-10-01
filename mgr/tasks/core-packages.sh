@@ -143,14 +143,14 @@ APT_PKGS=(
 
 AUR_PKGS=(
     lisgd
-    throne-bin
     portprotonqt
     iio-niri
 )
 
 GO_PKGS=(
     github.com/jorgerojas26/lazysql@latest
-    github.com/asdf-vm/asdf/cmd/asdf@v0.20.0
+    github.com/asdf-vm/asdf/cmd/asdf@latest
+    github.com/lilendian0x00/xray-knife/v11@latest
 )
 
 CARGO_PKGS=(
