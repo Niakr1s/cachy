@@ -59,3 +59,9 @@ window-rule {
     match app-id="^explorer.exe$"
     open-floating false
 }
+
+// @id=wr_1790967671163233932 @name=steam_proton
+window-rule {
+    match app-id="^steam_proton$"
+    open-floating false
+}
