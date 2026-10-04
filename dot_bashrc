@@ -18,6 +18,7 @@ PATH_ADDITIONS=(
     "$HOME/.asdf/shims"
     "$HOME/.local/share/chezmoi/mgr"
     "$HOME/.local/share/chezmoi/mgr/tools"
+    "$HOME/.config/emacs/bin"
 )
 export PATH="$PATH:$(IFS=:; echo "${PATH_ADDITIONS[*]}")"
 

@@ -43,6 +43,7 @@ APT_PKGS=(
     lostfiles
     joyutils # jscal, jstest and jsattach utilities for the Linux joystick driver
     xorg-xhost # fix for gameconqueror: xhost +local:
+    emacs
 
     # pdf stuff
     ghostscript poppler poppler-data
