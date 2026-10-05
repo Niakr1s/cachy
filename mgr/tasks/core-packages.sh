@@ -69,8 +69,8 @@ APT_PKGS=(
     ydotool
 
     # fonts
-    # noto-fonts-cjk
-    # noto-fonts-emoji
+    noto-fonts-cjk
+    noto-fonts-emoji
     ttf-nerd-fonts-symbols
     ttf-nerd-fonts-mono
     ttf-firacode-nerd
