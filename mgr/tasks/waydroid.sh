@@ -4,7 +4,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../lib/helpers.sh"
 
 log_info "Installing waydroid..."
-pkg_install waydroid
+pkg_install waydroid waydroid-image
 
 log_info "Initializing waydroid..."
 sudo waydroid init
