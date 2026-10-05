@@ -4,6 +4,12 @@
 (setq doom-theme 'doom-tokyo-night)
 (setq display-line-numbers-type t)
 
+;; --- Font Settings ---
+(setq doom-font (font-spec :family "Iosevka NFM" :size 11.0)
+      doom-variable-pitch-font (font-spec :family "Iosevka NFM" :size 11.0)
+      doom-big-font (font-spec :family "Iosevka NFM" :size 22.0)
+      doom-unicode-font (font-spec :family "Iosevka NFM" :size 11.0))
+
 ;; org mode
 (setq org-directory "~/org/")
 
@@ -25,7 +31,6 @@
 (use-package! clipetty
   :config
   (global-clipetty-mode +1))
-
 
 (defun my-open-todo-file ()
   "Automatically open todo.org (creating it if missing) if no other files are specified."

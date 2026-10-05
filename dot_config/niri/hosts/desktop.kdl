@@ -5,3 +5,6 @@ input {
         numlock
     }
 }
+
+workspace "emacs"
+spawn-sh-at-startup "emacs"
