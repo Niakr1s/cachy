@@ -27,7 +27,7 @@
   (global-clipetty-mode +1))
 
 
-(defun my-open-todo-on-client-connect ()
+(defun my-open-todo-file ()
   "Automatically open todo.org (creating it if missing) if no other files are specified."
   (let* ((todo-file (expand-file-name "~/org/todo.org"))
          (todo-dir (file-name-directory todo-file)))
@@ -40,7 +40,8 @@
       (find-file todo-file))))
 
 ;; Run this function every time an emacsclient frame is created
-(add-hook 'server-after-make-frame-hook #'my-open-todo-on-client-connect)
+(add-hook 'emacs-startup-hook #'my-open-todo-file)
+(add-hook 'server-after-make-frame-hook #'my-open-todo-file)
 
 (after! persp-mode
   ;; Prevent emacsclient -c / -nw from spawning blank workspaces
