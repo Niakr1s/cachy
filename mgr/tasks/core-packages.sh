@@ -58,6 +58,10 @@ APT_PKGS=(
     python-xlib
     fuse2
 
+    # lsp
+    python-lsp-server
+    bash-language-server
+
     # deps
     ddcutil
     i2c-tools
