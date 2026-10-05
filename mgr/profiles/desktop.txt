@@ -8,3 +8,4 @@ virtualization
 hibernation off
 ai-packages
 emulators
+waydroid
