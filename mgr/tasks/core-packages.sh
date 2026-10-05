@@ -59,7 +59,7 @@ APT_PKGS=(
     fuse2
 
     # lsp
-    python-lsp-server
+    python-lsp-server ty
     bash-language-server
 
     # deps
