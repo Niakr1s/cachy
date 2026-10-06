@@ -52,3 +52,6 @@ This stops Doom's internal post-init routines from prioritizing system fallbacks
   :config
   (global-clipetty-mode +1))
 
+(use-package! chezmoi)
+(global-set-key (kbd "C-c C f")  #'chezmoi-find)
+(global-set-key (kbd "C-c C s")  #'chezmoi-write)

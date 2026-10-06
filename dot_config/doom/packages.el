@@ -3,3 +3,4 @@
 (package! evil-terminal-cursor-changer)
 (package! eldoc-box)
 (package! clipetty)
+(package! chezmoi)
