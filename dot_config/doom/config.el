@@ -26,7 +26,8 @@ This stops Doom's internal post-init routines from prioritizing system fallbacks
     (set-fontset-font "fontset-default" 'cyrillic main-spec)
     (set-fontset-font t 'cyrillic main-spec)
     (set-fontset-font "fontset-default" '(#x0400 . #x04FF) main-spec nil 'prepend)
-    (set-fontset-font t '(#x0400 . #x04FF) main-spec nil 'prepend)))
+    (set-fontset-font t '(#x0400 . #x04FF) main-spec nil 'prepend))
+  )
 (add-hook 'after-setting-font-hook #'my-enforce-cyrillic-font-settings)
 
 ;; org mode
@@ -51,22 +52,22 @@ This stops Doom's internal post-init routines from prioritizing system fallbacks
   :config
   (global-clipetty-mode +1))
 
-(defun my-open-todo-file ()
-  "Automatically open todo.org (creating it if missing) if no other files are specified."
-  (let* ((todo-file (expand-file-name "~/org/todo.org"))
-         (todo-dir (file-name-directory todo-file)))
-    ;; Only run if the client didn't pass a specific file, and we aren't already looking at it
-    (when (not (string= (buffer-file-name) todo-file))
-      ;; Create the parent directory if it's completely missing
-      (unless (file-directory-p todo-dir)
-        (make-directory todo-dir t))
-      ;; Open (and visually switch to) the todo file
-      (find-file todo-file))))
+;; (defun my-open-todo-file ()
+;;   "Automatically open todo.org (creating it if missing) if no other files are specified."
+;;   (let* ((todo-file (expand-file-name "~/org/todo.org"))
+;;          (todo-dir (file-name-directory todo-file)))
+;;     ;; Only run if the client didn't pass a specific file, and we aren't already looking at it
+;;     (when (not (string= (buffer-file-name) todo-file))
+;;       ;; Create the parent directory if it's completely missing
+;;       (unless (file-directory-p todo-dir)
+;;         (make-directory todo-dir t))
+;;       ;; Open (and visually switch to) the todo file
+;;       (find-file todo-file))))
 
-;; Run this function every time an emacsclient frame is created
-(add-hook 'emacs-startup-hook #'my-open-todo-file)
-(add-hook 'server-after-make-frame-hook #'my-open-todo-file)
+;; ;; Run this function every time an emacsclient frame is created
+;; (add-hook 'emacs-startup-hook #'my-open-todo-file)
+;; (add-hook 'server-after-make-frame-hook #'my-open-todo-file)
 
-(after! persp-mode
-  ;; Prevent emacsclient -c / -nw from spawning blank workspaces
-  (setq persp-emacsclient-init-frame-behaviour-override "main"))
+;; (after! persp-mode
+;;   ;; Prevent emacsclient -c / -nw from spawning blank workspaces
+;;   (setq persp-emacsclient-init-frame-behaviour-override "main"))
