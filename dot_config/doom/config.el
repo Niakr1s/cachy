@@ -6,8 +6,8 @@
 
 ;; --- Font Settings ---
 (let* ((font-family "Iosevka NFM")
-       (default-size 15)
-       (large-size   24)
+       (default-size 12.0)
+       (large-size   24.0)
 
        (main-spec   (font-spec :family font-family :size default-size))
        (prop-spec   (font-spec :family font-family :size default-size))
