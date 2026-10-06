@@ -9,9 +9,9 @@
        (default-size 15)
        (large-size   24)
 
-       (main-spec   (font-spec :family font-family :size default-size :weight 'regular))
+       (main-spec   (font-spec :family font-family :size default-size))
        (prop-spec   (font-spec :family font-family :size default-size))
-       (big-spec    (font-spec :family font-family :size large-size   :weight 'regular))
+       (big-spec    (font-spec :family font-family :size large-size))
        (symbol-spec (font-spec :family font-family :size default-size)))
 
   (setq doom-font                main-spec
@@ -52,22 +52,3 @@ This stops Doom's internal post-init routines from prioritizing system fallbacks
   :config
   (global-clipetty-mode +1))
 
-;; (defun my-open-todo-file ()
-;;   "Automatically open todo.org (creating it if missing) if no other files are specified."
-;;   (let* ((todo-file (expand-file-name "~/org/todo.org"))
-;;          (todo-dir (file-name-directory todo-file)))
-;;     ;; Only run if the client didn't pass a specific file, and we aren't already looking at it
-;;     (when (not (string= (buffer-file-name) todo-file))
-;;       ;; Create the parent directory if it's completely missing
-;;       (unless (file-directory-p todo-dir)
-;;         (make-directory todo-dir t))
-;;       ;; Open (and visually switch to) the todo file
-;;       (find-file todo-file))))
-
-;; ;; Run this function every time an emacsclient frame is created
-;; (add-hook 'emacs-startup-hook #'my-open-todo-file)
-;; (add-hook 'server-after-make-frame-hook #'my-open-todo-file)
-
-;; (after! persp-mode
-;;   ;; Prevent emacsclient -c / -nw from spawning blank workspaces
-;;   (setq persp-emacsclient-init-frame-behaviour-override "main"))
