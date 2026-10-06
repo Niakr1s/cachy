@@ -107,6 +107,7 @@ APT_PKGS=(
     weechat
     l3afpad
     gnome-disk-utility
+    font-manager
     keepassxc
     dconf-editor
     remmina
