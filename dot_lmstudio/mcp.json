@@ -39,7 +39,8 @@
         "-y",
         "@modelcontextprotocol/server-filesystem",
         "/home/user/Projects",
-        "/home/user/mgr"
+        "/home/user/mgr",
+        "/tmp"
       ]
     },
     "sequential-thinking": {
