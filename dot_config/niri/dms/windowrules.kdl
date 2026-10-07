@@ -66,10 +66,8 @@ window-rule {
     open-floating false
 }
 
-// @id=wr_1791214536890668901 @name=Emacs
+// @id=wr_1791397596969869604 @name=Emacs
 window-rule {
     match app-id="^Emacs"
-    open-floating false
-    open-maximized true
     open-on-workspace "emacs"
 }
