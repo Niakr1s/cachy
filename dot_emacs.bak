@@ -161,3 +161,21 @@
   :ensure t
   :config
   (sleek-modeline-mode 1))
+
+(use-package drag-stuff
+  :ensure t
+  :init
+  (drag-stuff-global-mode 1)
+  :bind (:map drag-stuff-mode-map
+              ("M-p" . drag-stuff-up)
+              ("M-n" . drag-stuff-down)))
+
+(use-package magit)
+(use-package diff-hl
+  :config
+  (global-diff-hl-mode)
+  (advice-add 'vc-refresh-state :after #'diff-hl-update))
+
+(use-package surround
+  :ensure t
+  :bind-keymap ("M-'" . surround-keymap))
