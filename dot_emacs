@@ -1,0 +1,163 @@
+;; -*- lexical-binding: t; -*-
+
+;; PACKAGE MANAGEMENT
+(require 'package)
+
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
+(package-initialize)
+(unless package-archive-contents (package-refresh-contents))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+;; COMMON CONFIG
+(setopt frame-inhibit-implied-resize t)
+
+(setq inhibit-startup-message t)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(tooltip-mode -1)
+(scroll-bar-mode -1)
+(setq visible-bell nil)
+(setq indent-tabs-mode nil)
+(setq custom-file "~/.emacs.custom")
+(setq create-lockfiles nil)
+(setq auto-save-default nil)
+(setq make-backup-files nil)
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+
+(set-face-attribute 'default nil :font "Iosevka NFM" :height 120)
+
+(load-theme 'tango-dark)
+
+;; Fixes navigation in russian keyboard layout
+(defun reverse-input-method (input-method)
+  "Build the reverse mapping of single letters from INPUT-METHOD."
+  (interactive
+   (list (read-input-method-name "Use input method (default current): ")))
+  (if (and input-method (symbolp input-method))
+      (setq input-method (symbol-name input-method)))
+  (let ((current current-input-method)
+        (modifiers '(nil (control) (meta) (control meta))))
+    (when input-method
+      (activate-input-method input-method))
+    (when (and current-input-method quail-keyboard-layout)
+      (dolist (map (cdr (quail-map)))
+        (let* ((to (car map))
+               (from (quail-get-translation
+                      (cadr map) (char-to-string to) 1)))
+          (when (and (characterp from) (characterp to))
+            (dolist (mod modifiers)
+              (define-key local-function-key-map
+                (vector (append mod (list from)))
+                (vector (append mod (list to)))))))))
+    (when input-method
+      (activate-input-method current))))
+(reverse-input-method 'russian-computer)
+
+;; Emacs configuration
+(use-package emacs
+  :custom
+  ;; Enable context menu. `vertico-multiform-mode' adds a menu in the minibuffer
+  ;; to switch display modes.
+  (context-menu-mode t)
+  ;; Support opening new minibuffers from inside existing minibuffers.
+  (enable-recursive-minibuffers t)
+  ;; Hide commands in M-x which do not work in the current mode.  Vertico
+  ;; commands are hidden in normal buffers. This setting is useful beyond
+  ;; Vertico.
+  (read-extended-command-predicate #'command-completion-default-include-p)
+  ;; Do not allow the cursor in the minibuffer prompt
+  (minibuffer-prompt-properties
+   '(read-only t cursor-intangible t face minibuffer-prompt)))
+
+;; Enable Vertico.
+(use-package vertico
+  :custom
+  (vertico-scroll-margin 0) ;; Different scroll margin
+  (vertico-count 20) ;; Show more candidates
+  (vertico-resize t) ;; Grow and shrink the Vertico minibuffer
+  (vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
+  :init
+  (vertico-mode))
+
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
+  :init
+  (savehist-mode))
+
+;; Optionally use the `orderless' completion style.
+(use-package orderless
+  :custom
+  ;; Configure a custom style dispatcher (see the Consult wiki)
+  ;; (orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch))
+  ;; (orderless-component-separator #'orderless-escapable-split-on-space)
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles partial-completion))))
+  (completion-category-defaults nil) ;; Disable defaults, use our settings
+  (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
+
+
+(use-package corfu
+  ;; Optional customizations
+  :custom
+  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  (corfu-preview-current nil)    ;; Disable current candidate preview
+  (corfu-preselect 'prompt)      ;; Preselect the prompt
+  (corfu-on-exact-match 'insert) ;; Configure handling of exact matches
+
+  ;; Enable Corfu only for certain modes. See also `global-corfu-modes'.
+  :hook ((prog-mode . corfu-mode)
+         (shell-mode . corfu-mode)
+         (eshell-mode . corfu-mode))
+
+  :init
+
+  ;; Recommended: Enable Corfu globally.  Recommended since many modes provide
+  ;; Capfs and Dabbrev can be used globally (M-/).  See also the customization
+  ;; variable `global-corfu-modes' to exclude certain modes.
+  (global-corfu-mode)
+
+  ;; Enable optional extension modes:
+  (corfu-history-mode)
+  (corfu-mouse-mode)
+  (corfu-popupinfo-mode)
+  )
+
+;; A few more useful configurations...
+(use-package emacs
+  :custom
+  ;; TAB cycle if there are only few candidates
+  ;; (completion-cycle-threshold 3)
+
+  ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (tab-always-indent 'complete)
+
+  ;; Emacs 30 and newer: Disable Ispell completion function.
+  ;; Try `cape-dict' as an alternative.
+  (text-mode-ispell-word-completion nil)
+
+  ;; Hide commands in M-x which do not apply to the current mode.  Corfu
+  ;; commands are hidden, since they are not used via M-x. This setting is
+  ;; useful beyond Corfu.
+  (read-extended-command-predicate #'command-completion-default-include-p))
+
+(use-package eglot)
+
+(use-package eldoc-box
+  :ensure t
+  :hook (eglot-managed-mode . eldoc-box-hover-at-point-mode))
+
+(use-package which-key
+  :init
+  (which-key-mode)
+  )
+(use-package sleek-modeline
+  :ensure t
+  :config
+  (sleek-modeline-mode 1))
