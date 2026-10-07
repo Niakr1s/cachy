@@ -4,3 +4,4 @@
 (package! eldoc-box)
 (package! clipetty)
 (package! chezmoi)
+(package! llm-tool-collection :recipe '(:host github :repo "skissue/llm-tool-collection"))

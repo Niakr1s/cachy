@@ -21,14 +21,12 @@
         doom-serif-font          symbol-spec)
 
   (defun my-enforce-cyrillic-font-settings ()
-    "Explicitly forces the active frame and global fontset to bind Cyrillic to Iosevka NFM.
-This stops Doom's internal post-init routines from prioritizing system fallbacks."
     (set-fontset-font "fontset-default" 'cyrillic main-spec)
-    (set-fontset-font t 'cyrillic main-spec)
-    (set-fontset-font "fontset-default" '(#x0400 . #x04FF) main-spec nil 'prepend)
-    (set-fontset-font t '(#x0400 . #x04FF) main-spec nil 'prepend))
+    (set-fontset-font t 'cyrillic main-spec))
   )
 (add-hook 'after-setting-font-hook #'my-enforce-cyrillic-font-settings)
+
+(setq default-input-method "russian-computer")
 
 ;; org mode
 (setq org-directory "~/org/")
@@ -40,14 +38,6 @@ This stops Doom's internal post-init routines from prioritizing system fallbacks
 (mouse-wheel-mode)
 (evil-terminal-cursor-changer-activate)
 
-(use-package! eldoc-box
-  :after eldoc
-  :config
-  ;; Enable the minor mode that shows docs in a childframe
-  ;; at the upper corner of the frame.
-  (eldoc-box-hover-at-point-mode +1)
-  )
-
 (use-package! clipetty
   :config
   (global-clipetty-mode +1))
@@ -55,3 +45,43 @@ This stops Doom's internal post-init routines from prioritizing system fallbacks
 (use-package! chezmoi)
 (global-set-key (kbd "C-c C f")  #'chezmoi-find)
 (global-set-key (kbd "C-c C s")  #'chezmoi-write)
+
+;; LLM
+(use-package! gptel
+  :ensure t
+  :config
+  ;; Your existing default streaming backend (keep this for regular chat)
+  (setq gptel-model 'lmstudio)
+  (setq gptel-backend
+        (gptel-make-openai "lmstudio"
+          :protocol "http"
+          :host "localhost:1234"
+          :models '((lmstudio))
+          :stream t)) ; Streaming enabled for regular chat
+
+  ;; NEW: Define a separate, non-streaming backend for gptel-quick
+  (setq gptel-quick-model 'lmstudio-quick)
+  (setq gptel-quick-backend
+        (gptel-make-openai "lmstudio-quick"
+          :protocol "http"
+          :host "localhost:1234"
+          :models '((lmstudio))
+          :stream nil))) ; Streaming DISABLED for quick lookups
+
+(use-package! llm-tool-collection
+  :config
+  (mapcar (apply-partially #'apply #'gptel-make-tool)
+          (llm-tool-collection-get-all)))
+
+;; Magnet links in orgmode
+(with-eval-after-load 'org
+  (org-link-set-parameters "magnet"
+    :follow (lambda (link)
+              (browse-url (concat "magnet:" link)))
+    :export (lambda (path desc format _)
+              (cond
+               ((eq format 'html)
+                (format "<a href=\"magnet:%s\">%s</a>" path (or desc path)))
+               ((eq format 'latex)
+                (format "\\href{magnet:%s}{%s}" path (or desc path)))
+               (t nil)))))
