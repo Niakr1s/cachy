@@ -44,6 +44,7 @@ APT_PKGS=(
     joyutils # jscal, jstest and jsattach utilities for the Linux joystick driver
     xorg-xhost # fix for gameconqueror: xhost +local:
     emacs
+    pandoc
 
     # pdf stuff
     ghostscript poppler poppler-data
@@ -61,6 +62,13 @@ APT_PKGS=(
     # lsp
     python-lsp-server ty
     bash-language-server
+    gopls
+    marksman
+    python-pipenv
+    python-pytest
+    shfmt
+    shellcheck
+    tidy
 
     # deps
     ddcutil
