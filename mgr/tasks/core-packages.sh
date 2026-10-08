@@ -45,6 +45,7 @@ APT_PKGS=(
     xorg-xhost # fix for gameconqueror: xhost +local:
     emacs
     pandoc
+    llama-cpp
 
     # pdf stuff
     ghostscript poppler poppler-data

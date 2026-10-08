@@ -8,7 +8,13 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../lib/helpers.sh"
 
-pkg_install nvidia-container-toolkit nvidia-prime
+APT_PKGS=(
+  nvidia-container-toolkit
+  nvidia-prime
+  ggml-cuda
+)
+
+pkg_install "${APT_PKGS[@]}"
 
 install_nvidia_pstated() {
   local url="https://github.com/sasha0552/nvidia-pstated/releases/download/v1.0.9/nvidia-pstated"
