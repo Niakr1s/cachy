@@ -7,7 +7,6 @@ APT_PKGS=(
 )
 
 AM_PKGS=(
-  lmstudio
 )
 
 pkg_install "${APT_PKGS[@]}"
