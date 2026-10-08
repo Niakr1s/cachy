@@ -5,3 +5,4 @@
 (package! clipetty)
 (package! chezmoi)
 (package! llm-tool-collection :recipe '(:host github :repo "skissue/llm-tool-collection"))
+(package! evil-surround)

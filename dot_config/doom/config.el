@@ -31,6 +31,12 @@
 ;; org mode
 (setq org-directory "~/org/")
 
+(defun org-babel-edit-prep:python (babel-info)
+  (let ((tangle-file (assoc-default :tangle (nth 2 babel-info))))
+    (when (and tangle-file (not (eq tangle-file 'no)))
+      (setq-local buffer-file-name
+                  (expand-file-name tangle-file)))))
+
 ;; Autocompletion
 (setq corfu-auto-prefix 1)
 
@@ -50,23 +56,21 @@
 (use-package! gptel
   :ensure t
   :config
-  ;; Your existing default streaming backend (keep this for regular chat)
-  (setq gptel-model 'lmstudio)
-  (setq gptel-backend
-        (gptel-make-openai "lmstudio"
-          :protocol "http"
-          :host "localhost:1234"
-          :models '((lmstudio))
-          :stream t)) ; Streaming enabled for regular chat
-
-  ;; NEW: Define a separate, non-streaming backend for gptel-quick
-  (setq gptel-quick-model 'lmstudio-quick)
-  (setq gptel-quick-backend
-        (gptel-make-openai "lmstudio-quick"
-          :protocol "http"
-          :host "localhost:1234"
-          :models '((lmstudio))
-          :stream nil))) ; Streaming DISABLED for quick lookups
+  (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll) ;; Auto scroll automatically
+  (add-hook 'gptel-post-response-functions 'gptel-end-of-response) ;; Auto move cursor to the next prompt
+  (setq
+   gptel-model 'ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF
+   gptel-backend (gptel-make-openai "llama.cpp"
+                   :host "localhost:9931"
+                   :endpoint "/v1/chat/completions"
+                   :protocol "http"
+                   :stream t
+                   :key "sk-no-key-required"
+                   :models '(
+                             "ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF"
+                             "Accio-Lab/occamy-1.0-GGUF"
+                             "HauhauCS/Gemma4-26B-A4B-Uncensored-HauhauCS-Balanced"
+                             "HauhauCS/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive"))))
 
 (use-package! llm-tool-collection
   :config
@@ -76,12 +80,17 @@
 ;; Magnet links in orgmode
 (with-eval-after-load 'org
   (org-link-set-parameters "magnet"
-    :follow (lambda (link)
-              (browse-url (concat "magnet:" link)))
-    :export (lambda (path desc format _)
-              (cond
-               ((eq format 'html)
-                (format "<a href=\"magnet:%s\">%s</a>" path (or desc path)))
-               ((eq format 'latex)
-                (format "\\href{magnet:%s}{%s}" path (or desc path)))
-               (t nil)))))
+                           :follow (lambda (link)
+                                     (browse-url (concat "magnet:" link)))
+                           :export (lambda (path desc format _)
+                                     (cond
+                                      ((eq format 'html)
+                                       (format "<a href=\"magnet:%s\">%s</a>" path (or desc path)))
+                                      ((eq format 'latex)
+                                       (format "\\href{magnet:%s}{%s}" path (or desc path)))
+                                      (t nil)))))
+
+(use-package! evil-surround
+  :ensure t
+  :config
+  (global-evil-surround-mode 1))
