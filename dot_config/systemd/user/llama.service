@@ -1,0 +1,30 @@
+[Unit]
+Description=llama.cpp server (models preset)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/models
+
+# Restrict to the second GPU (device index 1)
+Environment=CUDA_VISIBLE_DEVICES=1
+
+# Adjust the path if llama-server is not in your default PATH
+ExecStart=llama-server \
+    --models-preset %h/llama.ini \
+    --models-max 1 \
+    --tools all \
+    --ui-mcp-proxy \
+    --host 0.0.0.0 \
+    --port 9931
+
+Restart=on-failure
+RestartSec=5
+
+# Give the model time to load/unload cleanly
+TimeoutStopSec=30
+KillSignal=SIGINT
+
+[Install]
+WantedBy=default.target
