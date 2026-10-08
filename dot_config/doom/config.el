@@ -52,30 +52,36 @@
 (global-set-key (kbd "C-c C f")  #'chezmoi-find)
 (global-set-key (kbd "C-c C s")  #'chezmoi-write)
 
-;; LLM
 (use-package! gptel
   :ensure t
   :config
-  (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll) ;; Auto scroll automatically
-  (add-hook 'gptel-post-response-functions 'gptel-end-of-response) ;; Auto move cursor to the next prompt
-  (setq
-   gptel-model 'ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF
-   gptel-backend (gptel-make-openai "llama.cpp"
-                   :host "localhost:9931"
-                   :endpoint "/v1/chat/completions"
-                   :protocol "http"
-                   :stream t
-                   :key "sk-no-key-required"
-                   :models '(
-                             "ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF"
-                             "Accio-Lab/occamy-1.0-GGUF"
-                             "HauhauCS/Gemma4-26B-A4B-Uncensored-HauhauCS-Balanced"
-                             "HauhauCS/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive"))))
+  (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
+  (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
 
-(use-package! llm-tool-collection
+  (setq gptel-model 'moe/KAT-Coder-V2.5-Dev-APEX-I-Compact.gguf)
+  (setq gptel-models
+        '("moe/KAT-Coder-V2.5-Dev-APEX-I-Compact.gguf"
+          "dense/Qwen3.8-27B-GSQ-RCO-GGUF"
+          "moe/Gemma4-26B-A4B-Uncensored-HauhauCS-Balanced"
+          "moe/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive"))
+
+  (setq gptel-backend
+        (gptel-make-openai "llama.cpp"
+          :host "localhost:9931"
+          :endpoint "/v1/chat/completions"
+          :protocol "http"
+          :stream t
+          :key "sk-no-key-required"
+          :models gptel-models))
+  )
+
+(use-package! gptel-agent
   :config
-  (mapcar (apply-partially #'apply #'gptel-make-tool)
-          (llm-tool-collection-get-all)))
+  (gptel-agent-update)
+  (map! :leader
+        :desc "gptel-agent" "o l A" #'gptel-agent)
+  )
+
 
 ;; Magnet links in orgmode
 (with-eval-after-load 'org
