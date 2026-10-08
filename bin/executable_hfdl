@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+"""
+Download one or more GGUF files from Hugging Face URLs into a chosen directory.
+
+Usage:
+    python hf_download.py <hf_url> [<hf_url> ...] [--dir <target_dir>] [-f]
+
+Example:
+    python hf_download.py \
+        "https://huggingface.co/mudler/KAT-Coder-V2.5-Dev-APEX-GGUF/resolve/main/KAT-Coder-V2.5-Dev-APEX-I-Compact.gguf?download=true" \
+        --dir ./models
+"""
+
+
+
+import argparse
+import sys
+from pathlib import Path
+from urllib.parse import urlparse
+
+from huggingface_hub import hf_hub_download
+
+
+def parse_hf_url(url: str) -> tuple[str, str]:
+    """
+    Parse a Hugging Face resolve URL into (repo_id, filename).
+
+    Handles URLs like:
+      https://huggingface.co/<user>/<repo>/{resolve,blob}/<revision>/<path/to/file>
+    """
+    parsed = urlparse(url)
+    if "huggingface.co" not in parsed.netloc:
+        raise ValueError(f"Not a Hugging Face URL: {url}")
+
+    # Strip query string, split path
+    path = parsed.path.strip("/")
+    parts = path.split("/")
+
+    user, repo = parts[:2]
+    # parts[4:] is the file path relative to the repo root.
+    # It may span subdirectories, e.g. "sub/dir/model.gguf".
+    filename = "/".join(parts[4:])
+
+    repo_id = f"{user}/{repo}"
+    return repo_id, filename
+
+
+def download_one(url: str, target_dir: Path, force: bool = False) -> Path:
+    repo_id, filename = parse_hf_url(url)
+
+    # hf_hub_download(local_dir=...) mirrors the repo layout, so the file
+    # lands at <target_dir>/<user>/<repo>/<original_subpath>.
+    local_dir = target_dir / repo_id
+    local_dir.mkdir(parents=True, exist_ok=True)
+    dest = local_dir / filename
+
+    if dest.exists() and not force:
+        print(f"⏭️  Skipped (already downloaded): {dest}")
+        return dest
+    if dest.exists():  # force: remove stale file so hf_hub_download refetches
+        dest.unlink()
+
+    print(f"Repo:     {repo_id}")
+    print(f"File:     {filename}")
+    print(f"Target:   {local_dir}")
+
+    path = hf_hub_download(
+        repo_id=repo_id,
+        filename=filename,
+        local_dir=local_dir,
+    )
+    print(f"\n✅ Downloaded to: {path}")
+    return Path(path)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Download one or more files from Hugging Face URLs."
+    )
+    parser.add_argument(
+        "urls",
+        nargs="+",
+        metavar="hf_url",
+        help="one or more Hugging Face resolve URLs to download",
+    )
+    parser.add_argument(
+        "--dir",
+        default="~/models",
+        help="target directory (default: ~/models, created if missing)",
+    )
+    parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="re-download even if the file already exists",
+    )
+    args = parser.parse_args()
+
+    target_dir = Path(args.dir).expanduser()
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    failures = 0
+    for url in args.urls:
+        try:
+            download_one(url, target_dir, force=args.force)
+        except Exception as exc:
+            failures += 1
+            print(f"❌ Failed to download {url}: {exc}", file=sys.stderr)
+
+    sys.exit(1 if failures else 0)
+
+
+if __name__ == "__main__":
+    main()
