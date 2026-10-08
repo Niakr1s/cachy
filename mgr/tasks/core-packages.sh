@@ -58,6 +58,7 @@ APT_PKGS=(
     python-pyudev
     python-dbus-fast
     python-xlib
+    python-huggingface-hub
     fuse2
 
     # lsp
