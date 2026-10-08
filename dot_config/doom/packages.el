@@ -14,4 +14,5 @@
 (package! evil-terminal-cursor-changer)
 
 ;; === Custom / Third-party Packages ===
-(package! gptel-agent)
+;; (package! gptel-agent)
+(package! llm-tool-collection :recipe '(:host github :repo "skissue/llm-tool-collection"))

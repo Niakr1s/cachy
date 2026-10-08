@@ -52,18 +52,27 @@
 (global-set-key (kbd "C-c C f")  #'chezmoi-find)
 (global-set-key (kbd "C-c C s")  #'chezmoi-write)
 
+(use-package! llm-tool-collection
+  :after gptel
+  :config
+  (mapcar (apply-partially #'apply #'gptel-make-tool)
+          (llm-tool-collection-get-all))
+  )
+
 (use-package! gptel
   :ensure t
   :config
   (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
   (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
 
-  (setq gptel-model 'moe/KAT-Coder-V2.5-Dev-APEX-I-Compact.gguf)
+  (setq gptel-model 'Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-IQ3_M.gguf)
   (setq gptel-models
-        '("moe/KAT-Coder-V2.5-Dev-APEX-I-Compact.gguf"
-          "dense/Qwen3.8-27B-GSQ-RCO-GGUF"
-          "moe/Gemma4-26B-A4B-Uncensored-HauhauCS-Balanced"
-          "moe/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive"))
+        '(
+          "Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-IQ3_M.gguf"
+          "Qwen3.8-27B-GSQ-RCO-GGUF"
+          "Gemma4-26B-A4B-Uncensored-HauhauCS-Balanced"
+          "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive"
+          ))
 
   (setq gptel-backend
         (gptel-make-openai "llama.cpp"
@@ -73,15 +82,24 @@
           :stream t
           :key "sk-no-key-required"
           :models gptel-models))
-  )
 
-(use-package! gptel-agent
-  :config
-  (gptel-agent-update)
-  (map! :leader
-        :desc "gptel-agent" "o l A" #'gptel-agent)
-  )
+  (gptel-make-preset 'ro
+                     :description "Read-only tools."
+                     :tools '("view_file" "glob" "grep" "ls"
+                              "view_buffer" "buffer_search" "list_buffers"))
 
+  ;; Full access preset definition
+  (gptel-make-preset 'yolo
+                     :description "All tools including write and exec."
+                     :tools '("create_file" "create_directory" "view_file" "edit_file"
+                              "glob" "replace_file" "grep" "ls"
+                              "view_buffer" "edit_buffer" "replace_buffer"
+                              "buffer_search" "list_buffers"
+                              "bash" "eval_elisp"))
+
+  ;; Apply 'ro' globally so it becomes the default
+  (gptel--apply-preset 'ro)
+  )
 
 ;; Magnet links in orgmode
 (with-eval-after-load 'org
