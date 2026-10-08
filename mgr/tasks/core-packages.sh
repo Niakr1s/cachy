@@ -46,6 +46,7 @@ APT_PKGS=(
     emacs
     pandoc
     llama-cpp
+    calc
 
     # pdf stuff
     ghostscript poppler poppler-data
