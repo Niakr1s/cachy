@@ -69,7 +69,7 @@ def download_one(url: str, target_dir: Path, force: bool = False) -> Path:
         filename=filename,
         local_dir=local_dir,
     )
-    print(f"\n✅ Downloaded to: {path}")
+    print(f"\n✅ Downloaded to: {path}\n\n")
     return Path(path)
 
 
