@@ -48,6 +48,7 @@ APT_PKGS=(
     llama-cpp
     calc
     trash-cli
+    pax-utils # lddtree
 
     # pdf stuff
     ghostscript poppler poppler-data
@@ -159,6 +160,7 @@ APT_PKGS=(
 
     # native games
     luanti # minecraft like
+    angband
 )
 
 AUR_PKGS=(
