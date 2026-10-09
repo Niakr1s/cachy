@@ -47,6 +47,7 @@ APT_PKGS=(
     pandoc
     llama-cpp
     calc
+    trash-cli
 
     # pdf stuff
     ghostscript poppler poppler-data
