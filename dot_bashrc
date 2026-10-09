@@ -91,7 +91,7 @@ alias gc="git commit"
 
 # Eza
 ezaCmd() {
-    eza --group-directories-first --icons "$@"
+    eza --group-directories-first --icons --follow-symlinks "$@"
 }
 ezaCmdTotal() {
     ezaCmd --total-size "$@"
