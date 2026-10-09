@@ -73,7 +73,7 @@
           "Gemma4-E4B"
           ))
 
-  (setq gptel-model 'Qwen3.8-27B)
+  (setq gptel-model 'Qwen3.6-35B-A3B)
   (setq gptel-backend
         (gptel-make-openai "llama.cpp"
           :host "localhost:9931"
@@ -84,19 +84,20 @@
           :models gptel-models
           ))
 
-  (setq gptel-quick-model 'Qwen3.8-27B)
-  (setq gptel-quick-backend
-        (gptel-make-openai "llama.cpp"
-          :host "localhost:9931"
-          :endpoint "/v1/chat/completions"
-          :protocol "http"
-          :stream t
-          :key "sk-no-key-required"
-          :models gptel-models
-          :request-params '(
-                            :thinking (:type "disabled" :budget_tokens 0)
-                            :chat_template_kwargs (:enable_thinking :json-false))
-          ))
+  ;; I don't need this actually
+  ;; (setq gptel-quick-model 'Qwen3.6-35B-A3B)
+  ;; (setq gptel-quick-backend
+  ;;       (gptel-make-openai "llama.cpp"
+  ;;         :host "localhost:9931"
+  ;;         :endpoint "/v1/chat/completions"
+  ;;         :protocol "http"
+  ;;         :stream t
+  ;;         :key "sk-no-key-required"
+  ;;         :models gptel-models
+  ;;         :request-params '(
+  ;;                           :thinking (:type "disabled" :budget_tokens 0)
+  ;;                           :chat_template_kwargs (:enable_thinking :json-false))
+  ;;         ))
 
   (gptel-make-preset 'ro
     :description "Read-only tools."
