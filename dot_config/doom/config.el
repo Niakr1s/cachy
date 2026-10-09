@@ -65,15 +65,15 @@
   (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
   (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
 
-  (setq gptel-model 'Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-IQ3_M.gguf)
   (setq gptel-models
         '(
-          "Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-IQ3_M.gguf"
-          "Qwen3.8-27B-GSQ-RCO-GGUF"
-          "Gemma4-26B-A4B-Uncensored-HauhauCS-Balanced"
-          "Gemma-4-E4B-Uncensored-HauhauCS-Aggressive"
+          "Qwen3.8-27B"
+          "Qwen3.6-35B-A3B"
+          "Gemma4-26B-A4B"
+          "Gemma4-E4B"
           ))
 
+  (setq gptel-model 'Qwen3.8-27B)
   (setq gptel-backend
         (gptel-make-openai "llama.cpp"
           :host "localhost:9931"
@@ -81,21 +81,36 @@
           :protocol "http"
           :stream t
           :key "sk-no-key-required"
-          :models gptel-models))
+          :models gptel-models
+          ))
+
+  (setq gptel-quick-model 'Qwen3.8-27B)
+  (setq gptel-quick-backend
+        (gptel-make-openai "llama.cpp"
+          :host "localhost:9931"
+          :endpoint "/v1/chat/completions"
+          :protocol "http"
+          :stream t
+          :key "sk-no-key-required"
+          :models gptel-models
+          :request-params '(
+                            :thinking (:type "disabled" :budget_tokens 0)
+                            :chat_template_kwargs (:enable_thinking :json-false))
+          ))
 
   (gptel-make-preset 'ro
-                     :description "Read-only tools."
-                     :tools '("view_file" "glob" "grep" "ls"
-                              "view_buffer" "buffer_search" "list_buffers"))
+    :description "Read-only tools."
+    :tools '("view_file" "glob" "grep" "ls"
+             "view_buffer" "buffer_search" "list_buffers"))
 
   ;; Full access preset definition
   (gptel-make-preset 'yolo
-                     :description "All tools including write and exec."
-                     :tools '("create_file" "create_directory" "view_file" "edit_file"
-                              "glob" "replace_file" "grep" "ls"
-                              "view_buffer" "edit_buffer" "replace_buffer"
-                              "buffer_search" "list_buffers"
-                              "bash" "eval_elisp"))
+    :description "All tools including write and exec."
+    :tools '("create_file" "create_directory" "view_file" "edit_file"
+             "glob" "replace_file" "grep" "ls"
+             "view_buffer" "edit_buffer" "replace_buffer"
+             "buffer_search" "list_buffers"
+             "bash" "eval_elisp"))
 
   ;; Apply 'ro' globally so it becomes the default
   (gptel--apply-preset 'ro)

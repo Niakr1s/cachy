@@ -1,5 +1,5 @@
 [Unit]
-Description=llama.cpp server (models preset)
+Description=llama.cpp server (Instance %i)
 After=network-online.target
 Wants=network-online.target
 
@@ -7,23 +7,21 @@ Wants=network-online.target
 Type=simple
 WorkingDirectory=%h/models
 
-# Restrict to the second GPU (device index 1)
-Environment=CUDA_VISIBLE_DEVICES=1
+# Load instance-specific variables (CUDA_VISIBLE_DEVICES, PORT) from a file
+# The file path is determined by the instance name (%i)
+EnvironmentFile=%h/.config/llama/%i.env
 
-# Adjust the path if llama-server is not in your default PATH
+# CUDA_VISIBLE_DEVICES and PORT are now loaded from the EnvironmentFile above
 ExecStart=/home/user/llama.cpp/build/bin/llama-server \
-# ExecStart=llama-server \
     --models-preset %h/llama.ini \
     --models-max 1 \
     --tools all \
     --ui-mcp-proxy \
     --host 0.0.0.0 \
-    --port 9931
+    --port ${PORT}
 
 Restart=on-failure
 RestartSec=5
-
-# Give the model time to load/unload cleanly
 TimeoutStopSec=30
 KillSignal=SIGINT
 
