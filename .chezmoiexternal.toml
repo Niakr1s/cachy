@@ -12,8 +12,3 @@
     type = "git-repo"
     url = "https://github.com/tmux-plugins/tpm"
     refreshPeriod = "168h"
-
-["llama.cpp"]
-    type = "git-repo"
-    url = "https://github.com/ggml-org/llama.cpp"
-    refreshPeriod = "168h"
