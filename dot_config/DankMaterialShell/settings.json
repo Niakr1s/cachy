@@ -163,7 +163,12 @@
           "keyboardLayoutNameCompactMode": true
         },
         "workspaceSwitcher",
-        "focusedWindow"
+        {
+          "id": "focusedWindow",
+          "enabled": true,
+          "focusedWindowCompactMode": false,
+          "focusedWindowSize": 0
+        }
       ],
       "centerWidgets": [
         {
