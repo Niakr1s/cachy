@@ -134,3 +134,7 @@
   :ensure t
   :config
   (global-evil-surround-mode 1))
+
+(after! pdf-tools
+  (unless (file-executable-p pdf-info-epdfinfo-program)
+    (pdf-tools-install t)))
