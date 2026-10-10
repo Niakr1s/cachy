@@ -52,6 +52,11 @@
 (global-set-key (kbd "C-c C f")  #'chezmoi-find)
 (global-set-key (kbd "C-c C s")  #'chezmoi-write)
 
+(map! :leader
+      (:prefix-map ("f" . "file")
+       :desc "Fuzzy find files (fd)" "z" #'consult-fd))
+
+
 (use-package! llm-tool-collection
   :after gptel
   :config
