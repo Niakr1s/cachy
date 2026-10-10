@@ -16,3 +16,6 @@
 ;; === Custom / Third-party Packages ===
 ;; (package! gptel-agent)
 (package! llm-tool-collection :recipe '(:host github :repo "skissue/llm-tool-collection"))
+
+;; === Unsorted ===
+(package! transpose-frame)

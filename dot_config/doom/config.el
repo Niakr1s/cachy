@@ -145,3 +145,7 @@
 (after! pdf-tools
   (unless (file-executable-p pdf-info-epdfinfo-program)
     (pdf-tools-install t)))
+
+(use-package! transpose-frame
+  :bind ("C-c t" . transpose-frame)
+  )
