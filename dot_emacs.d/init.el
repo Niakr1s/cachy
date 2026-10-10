@@ -35,6 +35,9 @@
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file) (load custom-file))
 
+;; y/n instead of yes/no
+(setopt use-short-answers t)
+
 ;; UI: Less noise
 (setq inhibit-startup-screen t
       inhibit-startup-echo-area-message user-login-name
