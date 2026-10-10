@@ -28,7 +28,7 @@ command_exists() {
 pkg_install() {
     local pkgs=($@)
     log_info "Installing: ${pkgs[*]}"
-    shelly -Is --needed --no-confirm "${pkgs[@]}"
+    pacman -S --needed --no-confirm "${pkgs[@]}"
 }
 
 # Install one or more AUR packages
