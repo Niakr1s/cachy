@@ -40,6 +40,9 @@
   (setq default-input-method "russian-computer")
   )
 
+;; Disable doom big font mode
+(advice-add 'doom-big-font-mode :override #'ignore)
+
 ;; --- Org mode ---
 (setq org-directory "~/org/")
 
