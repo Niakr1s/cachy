@@ -85,7 +85,6 @@ APT_PKGS=(
     noto-fonts-cjk
     noto-fonts-emoji
     ttf-nerd-fonts-symbols
-    ttf-nerd-fonts-mono
     ttf-firacode-nerd
     ttf-iosevka-nerd
 
