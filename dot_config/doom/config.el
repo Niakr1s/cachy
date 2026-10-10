@@ -1,5 +1,7 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
+(load! "modes/char-info-mode")
+
 ;; Appearance
 (setq doom-theme 'doom-tokyo-night)
 (setq display-line-numbers-type t)
