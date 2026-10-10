@@ -67,8 +67,10 @@
 (use-package! gptel
   :ensure t
   :config
-  (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
-  (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
+
+  ;; Don't need this actually
+  ;; (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
+  ;; (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
 
   (setq gptel-models
         '(
