@@ -1,0 +1,17 @@
+[Unit]
+Description=comfyui server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/ComfyUI
+
+ExecStart=%h/ComfyUI/UmeAiRT-Start-ComfyUI.sh
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGINT
+
+[Install]
+WantedBy=default.target
