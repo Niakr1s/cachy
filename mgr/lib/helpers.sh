@@ -28,7 +28,7 @@ command_exists() {
 pkg_install() {
     local pkgs=($@)
     log_info "Installing: ${pkgs[*]}"
-    pacman -S --needed --no-confirm "${pkgs[@]}"
+    sudo pacman -S --needed --noconfirm "${pkgs[@]}"
 }
 
 # Install one or more AUR packages
