@@ -154,3 +154,5 @@
   )
 
 (use-package magit)
+
+(use-package vterm)
