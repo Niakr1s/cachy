@@ -9,24 +9,34 @@
        (default-size 12.0)
        (large-size   24.0)
 
-       (main-spec   (font-spec :family font-family :size default-size))
-       (prop-spec   (font-spec :family font-family :size default-size))
-       (big-spec    (font-spec :family font-family :size large-size))
-       (symbol-spec (font-spec :family font-family :size default-size)))
+       (main-spec   (font-spec :family font-family))
+       (main-spec-default-size   (font-spec :family font-family :size default-size))
+       (big-spec-big-size    (font-spec :family font-family :size large-size))
+       )
 
-  (setq doom-font                main-spec
-        doom-variable-pitch-font prop-spec
-        doom-big-font            big-spec
-        doom-unicode-font        symbol-spec
-        doom-serif-font          symbol-spec)
+  (setq
+   doom-font                main-spec-default-size
+   doom-big-font            big-spec-big-size
+   )
 
-  (defun my-enforce-cyrillic-font-settings ()
-    (set-fontset-font "fontset-default" 'cyrillic main-spec)
-    (set-fontset-font t 'cyrillic main-spec))
+  (after! info
+    (set-face-attribute 'Info-quoted nil
+                        :inherit 'variable-pitch
+                        :family font-family
+                        :height 'unspecified))
+
+  (defun my-enforce-other-font-settings ()
+    (dolist (script '(
+                      latin
+                      cyrillic
+                      greek
+                      braille
+                      ))
+      (set-fontset-font t script main-spec))
+    )
+  (add-hook 'after-setting-font-hook #'my-enforce-other-font-settings)
+  (setq default-input-method "russian-computer")
   )
-(add-hook 'after-setting-font-hook #'my-enforce-cyrillic-font-settings)
-
-(setq default-input-method "russian-computer")
 
 ;; org mode
 (setq org-directory "~/org/")
