@@ -5,7 +5,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-WorkingDirectory=%h/models
+WorkingDirectory=%h/models/LLM
 
 # Load instance-specific variables (CUDA_VISIBLE_DEVICES, PORT) from a file
 # The file path is determined by the instance name (%i)
