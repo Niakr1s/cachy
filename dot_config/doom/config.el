@@ -65,8 +65,8 @@
 (global-set-key (kbd "C-c C s")  #'chezmoi-write)
 
 (map! :leader
-      (:prefix-map ("f" . "file")
-       :desc "Fuzzy find files (fd)" "z" #'consult-fd))
+      :desc "fuzzy find files (fd)" "f z" #'consult-fd)
+
 
 
 (use-package! llm-tool-collection
