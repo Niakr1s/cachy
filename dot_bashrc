@@ -99,10 +99,8 @@ ezaCmdTotal() {
 alias l="ezaCmd -a"
 alias ll="ezaCmd -l"
 alias la="ezaCmd -la"
-alias latree="ezaCmd -la --tree"
 alias llt="ezaCmdTotal -l"
 alias lat="ezaCmdTotal -la"
-alias lattree="ezaCmdTotal -la --tree"
 
 # Fixes for pagers
 export LESS='-R'
