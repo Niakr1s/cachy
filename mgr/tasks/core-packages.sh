@@ -134,7 +134,6 @@ APT_PKGS=(
     mpv
     telegram-desktop
     moonlight-qt
-    obsidian
     sunshine
     obs-studio-browser # cachyos's obs-studio
     gpu-screen-recorder
