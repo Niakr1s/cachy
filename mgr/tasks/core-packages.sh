@@ -74,6 +74,7 @@ APT_PKGS=(
     shfmt
     shellcheck
     tidy
+    zls
 
     # deps
     ddcutil
@@ -102,6 +103,7 @@ APT_PKGS=(
     nodejs npm deno
     cargo lldb
     ruby tk ruby-stdlib
+    zig
 
     # theming
     qt5ct
