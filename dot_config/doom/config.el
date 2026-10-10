@@ -40,7 +40,7 @@
   (setq default-input-method "russian-computer")
   )
 
-;; org mode
+;; --- Org mode ---
 (setq org-directory "~/org/")
 
 (defun org-babel-edit-prep:python (babel-info)
@@ -56,11 +56,7 @@
 (mouse-wheel-mode)
 (evil-terminal-cursor-changer-activate)
 
-(use-package! clipetty
-  :config
-  (global-clipetty-mode +1))
-
-(use-package! chezmoi)
+;; --- Keybinds ---
 (global-set-key (kbd "C-c C f")  #'chezmoi-find)
 (global-set-key (kbd "C-c C s")  #'chezmoi-write)
 
@@ -68,6 +64,12 @@
       :desc "fuzzy find files (fd)" "f z" #'consult-fd)
 
 
+;; --- Packages ---
+(use-package! clipetty
+  :config
+  (global-clipetty-mode +1))
+
+(use-package! chezmoi)
 
 (use-package! llm-tool-collection
   :after gptel
