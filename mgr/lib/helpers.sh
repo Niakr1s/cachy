@@ -26,14 +26,14 @@ command_exists() {
 
 # Install one or more APT packages
 pkg_install() {
-    local pkgs=($@)
+    local pkgs=("$@")
     log_info "Installing: ${pkgs[*]}"
     sudo pacman -S --needed --noconfirm "${pkgs[@]}"
 }
 
 # Install one or more AUR packages
 aur_install() {
-    local pkgs=($@)
+    local pkgs=("$@")
     log_info "Installing: ${pkgs[*]}"
     which yay &>/dev/null || pkg_install yay
     yay -S --needed --noconfirm "${pkgs[@]}"
@@ -46,7 +46,7 @@ go_install() {
         pkg_install go
     }
 
-    local pkgs=($@)
+    local pkgs=("$@")
     for pkg in "${pkgs[@]}"; do
         log_info "Installing Go package: $pkg"
         go install "$pkg"
@@ -59,7 +59,7 @@ cargo_install() {
         pkg_install cargo
     }
 
-    local pkgs=($@)
+    local pkgs=("$@")
     for pkg in "${pkgs[@]}"; do
         log_info "Installing Cargo package: $pkg"
         cargo install "$pkg"
@@ -72,7 +72,7 @@ am_install() {
         curl -sSf https://raw.githubusercontent.com/ivan-hc/AM/main/AM-INSTALLER | sh -s -- -i am
     }
 
-    local pkgs=($@)
+    local pkgs=("$@")
     for pkg in "${pkgs[@]}"; do
         if command_exists "$pkg"; then
             log_info "Skipping AM package (exists): $pkg"
