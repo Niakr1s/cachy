@@ -5,3 +5,5 @@
 	name = Niakr1s
 [pull]
 	rebase = false
+[core]
+	longpaths = true
