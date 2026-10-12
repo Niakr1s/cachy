@@ -12,3 +12,8 @@
     type = "git-repo"
     url = "https://github.com/tmux-plugins/tpm"
     refreshPeriod = "168h"
+
+[".emacs.d"]
+    type = "git-repo"
+    url = "git@github.com:Niakr1s/minimal-emacs.d.git"
+    refreshPeriod = "168h"
