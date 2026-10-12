@@ -142,6 +142,7 @@ APT_PKGS=(
     gpu-screen-recorder
     kdenlive
     squeekboard
+    gthumb
 
     # browsers
     firefox
