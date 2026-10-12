@@ -187,8 +187,8 @@ AM_PKGS=(
 
 pkg_install "${APT_PKGS[@]}"
 aur_install "${AUR_PKGS[@]}"
+sudo pkgfile --update # don't know where to put it, but don't want to forget
+
 go_install "${GO_PKGS[@]}"
 cargo_install "${CARGO_PKGS[@]}"
 am_install "${AM_PKGS[@]}"
-
-sudo pkgfile --update # don't know where to put it, but don't want to forget
