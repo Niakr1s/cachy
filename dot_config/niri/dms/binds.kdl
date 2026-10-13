@@ -71,8 +71,8 @@ binds {
     Mod+V { toggle-window-floating; }
     Mod+Delete { power-off-monitors; }
     Mod+E { spawn "nautilus"; }
-    Mod+M { spawn "emacs"; }
+    Mod+M { spawn "emacsclient" "-a=" "-c"; }
     Mod+Return hotkey-overlay-title="Open Terminal" { spawn "kitty"; }
-    Mod+Shift+M { spawn "emacsclient" "-a=" "-c"; }
+    Mod+Shift+M { spawn "emacs"; }
     Mod+Tab repeat=false { toggle-overview; }
 }
