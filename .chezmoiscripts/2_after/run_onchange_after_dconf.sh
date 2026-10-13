@@ -53,6 +53,9 @@ sort-column='name'
 sort-directories-first=true
 sort-order='ascending'
 type-format='category'
+
+[org/gnome/desktop/input-sources]
+sources=[('xkb', 'us'), ('xkb', 'ru')]
 """
 # ============================================================
 
