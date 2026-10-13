@@ -15,5 +15,10 @@
 
 [".emacs.d"]
     type = "git-repo"
-    url = "git@github.com:Niakr1s/minimal-emacs.d.git"
+    url = "https://github.com/syl20bnr/spacemacs"
+    refreshPeriod = "168h"
+
+[".spacemacs.d"]
+    type = "git-repo"
+    url = "git@github.com:Niakr1s/spacemacs.git"
     refreshPeriod = "168h"
