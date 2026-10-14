@@ -6,184 +6,184 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../lib/helpers.sh"
 
 APT_PKGS=(
-    cachy-chroot
-    wl-clipboard
-    neovim python-pynvim
-    glow
-    nvtop
-    yazi
-    borgbackup python-pyfuse3
-    zoxide
-    chezmoi
-    direnv
-    eza
-    fzf
-    tree
-    bottom
-    duf
-    gdu
-    playerctl
-    aria2
-    xclip
-    mediainfo
-    ripgrep
-    rofi
-    tealdeer
-    pkgfile
-    compsize
-    lazygit
-    mitmproxy
-    jp2a
-    imagemagick
-    gpu-viewer
-    gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly
-    evtest
-    yt-dlp
-    vulkan-tools
-    lostfiles
-    joyutils # jscal, jstest and jsattach utilities for the Linux joystick driver
-    xorg-xhost # fix for gameconqueror: xhost +local:
-    emacs
-    pandoc
-    llama-cpp
-    calc
-    trash-cli
-    pax-utils # lddtree
-    texlive-bin # otfinfo
-    hyperfine
+  cachy-chroot
+  wl-clipboard
+  neovim python-pynvim
+  glow
+  nvtop
+  yazi
+  borgbackup python-pyfuse3
+  zoxide
+  chezmoi
+  direnv
+  eza
+  fzf
+  tree
+  bottom
+  duf
+  gdu
+  playerctl
+  aria2
+  xclip
+  mediainfo
+  ripgrep
+  rofi
+  tealdeer
+  pkgfile
+  compsize
+  lazygit
+  mitmproxy
+  jp2a
+  imagemagick
+  gpu-viewer
+  gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly
+  evtest
+  yt-dlp
+  vulkan-tools
+  lostfiles
+  joyutils   # jscal, jstest and jsattach utilities for the Linux joystick driver
+  xorg-xhost # fix for gameconqueror: xhost +local:
+  emacs
+  pandoc
+  llama-cpp
+  calc
+  trash-cli
+  pax-utils   # lddtree
+  texlive-bin # otfinfo
+  hyperfine
 
-    # pdf stuff
-    ghostscript poppler poppler-data
+  # pdf stuff
+  ghostscript poppler poppler-data
 
-    # archive
-    unarchiver zip unzip unrar lz4 7zip
+  # archive
+  unarchiver zip unzip unrar lz4 7zip
 
-    # libs
-    # needed for joystickwake
-    python-pyudev
-    python-dbus-fast
-    python-xlib
-    python-huggingface-hub
-    fuse2
+  # libs
+  # needed for joystickwake
+  python-pyudev
+  python-dbus-fast
+  python-xlib
+  python-huggingface-hub
+  fuse2
 
-    # lsp
-    python-lsp-server ty
-    bash-language-server
-    gopls
-    marksman
-    python-pipenv
-    python-pytest
-    shfmt
-    shellcheck
-    tidy
-    zls
+  # lsp
+  python-lsp-server ty
+  bash-language-server
+  gopls
+  marksman
+  python-pipenv
+  python-pytest
+  shfmt
+  shellcheck
+  tidy
+  zls
 
-    # deps
-    ddcutil
-    i2c-tools
-    wtype
-    ydotool
+  # deps
+  ddcutil
+  i2c-tools
+  wtype
+  ydotool
 
-    # fonts
-    noto-fonts-cjk
-    noto-fonts-emoji
-    ttf-nerd-fonts-symbols-mono
-    ttf-nerd-fonts-symbols
-    ttf-firacode-nerd
-    ttf-iosevka-nerd
+  # fonts
+  noto-fonts-cjk
+  noto-fonts-emoji
+  ttf-nerd-fonts-symbols-mono
+  ttf-nerd-fonts-symbols
+  ttf-firacode-nerd
+  ttf-iosevka-nerd
 
-    # services
-    xdg-desktop-portal-gnome
-    xdg-desktop-portal-wlr
-    syncthing
-    caddy mkcert
+  # services
+  xdg-desktop-portal-gnome
+  xdg-desktop-portal-wlr
+  syncthing
+  caddy mkcert
 
-    # programming
-    cmake ninja
-    uv
-    go
-    nodejs npm deno
-    cargo lldb
-    ruby tk ruby-stdlib
-    zig
+  # programming
+  cmake ninja
+  uv
+  go
+  nodejs npm deno
+  cargo lldb
+  ruby tk ruby-stdlib
+  zig
 
-    # theming
-    qt5ct
-    qt6ct
-    adw-gtk-theme
+  # theming
+  qt5ct
+  qt6ct
+  adw-gtk-theme
 
-    # gui
-    imv krita
-    libreoffice
-    librecad
-    mission-center
-    qbittorrent
-    nautilus
-    sqlitebrowser
-    foliate
-    weechat
-    l3afpad
-    gnome-disk-utility
-    font-manager
-    keepassxc
-    dconf-editor
-    remmina
-    kitty
-    handbrake
-    strawberry
-    kdeconnect
-    kid3
-    zed
-    strawberry
-    mpv
-    telegram-desktop
-    moonlight-qt
-    sunshine
-    obs-studio-browser # cachyos's obs-studio
-    gpu-screen-recorder
-    kdenlive
-    squeekboard
-    gthumb
+  # gui
+  imv krita
+  libreoffice
+  librecad
+  mission-center
+  qbittorrent
+  nautilus
+  sqlitebrowser
+  foliate
+  weechat
+  l3afpad
+  gnome-disk-utility
+  font-manager
+  keepassxc
+  dconf-editor
+  remmina
+  kitty
+  handbrake
+  strawberry
+  kdeconnect
+  kid3
+  zed
+  strawberry
+  mpv
+  telegram-desktop
+  moonlight-qt
+  sunshine
+  obs-studio-browser # cachyos's obs-studio
+  gpu-screen-recorder
+  kdenlive
+  squeekboard
+  gthumb
 
-    # browsers
-    firefox
-    chromium
+  # browsers
+  firefox
+  chromium
 
-    # hardware
-    cpu-x
-    hardinfo2 apcupsd fwupd
-    occt
+  # hardware
+  cpu-x
+  hardinfo2 apcupsd fwupd
+  occt
 
-    # games stuff
-    mangohud
-    gamescope
-    gamemode
-    steam
-    scanmem # cheat engine alternative
-    gameconqueror # doesn't work though
+  # games stuff
+  mangohud
+  gamescope
+  gamemode
+  steam
+  scanmem       # cheat engine alternative
+  gameconqueror # doesn't work though
 
-    # native games
-    luanti # minecraft like
-    angband
+  # native games
+  luanti # minecraft like
+  angband
 )
 
 AUR_PKGS=(
-    lisgd iio-niri
-    portprotonqt
+  lisgd iio-niri
+  portprotonqt
 )
 
 GO_PKGS=(
-    github.com/jorgerojas26/lazysql@latest
-    github.com/asdf-vm/asdf/cmd/asdf@latest
-    github.com/lilendian0x00/xray-knife/v11@latest
+  github.com/jorgerojas26/lazysql@latest
+  github.com/asdf-vm/asdf/cmd/asdf@latest
+  github.com/lilendian0x00/xray-knife/v11@latest
 )
 
 CARGO_PKGS=(
 )
 
 AM_PKGS=(
-    lossless-cut
-    crossmacro
+  lossless-cut
+  crossmacro
 )
 
 pkg_install "${APT_PKGS[@]}"
