@@ -50,7 +50,7 @@ APT_PKGS=(
   pax-utils   # lddtree
   texlive-bin # otfinfo
   hyperfine
-  gitui # I'll probably switch from layzgit
+  lazygit
 
   # pdf stuff
   ghostscript poppler poppler-data
