@@ -31,7 +31,6 @@ APT_PKGS=(
   tealdeer
   pkgfile
   compsize
-  lazygit
   mitmproxy
   jp2a
   imagemagick
