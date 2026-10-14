@@ -50,6 +50,7 @@ APT_PKGS=(
     trash-cli
     pax-utils # lddtree
     texlive-bin # otfinfo
+    hyperfine
 
     # pdf stuff
     ghostscript poppler poppler-data
