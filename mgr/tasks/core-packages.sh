@@ -67,6 +67,7 @@ APT_PKGS=(
   fuse2
 
   # lsp
+  tree-sitter tree-sitter-cli
   python-lsp-server ty
   bash-language-server
   gopls
