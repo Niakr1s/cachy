@@ -6,5 +6,5 @@ input {
     }
 }
 
-workspace "emacs"
-spawn-sh-at-startup "emacs"
+// workspace "emacs"
+// spawn-sh-at-startup "emacs"
