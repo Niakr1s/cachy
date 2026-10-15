@@ -103,6 +103,7 @@ APT_PKGS=(
   uv
   go
   rust
+  lua51 luajit
   nodejs npm deno
   cargo lldb
   ruby tk ruby-stdlib
