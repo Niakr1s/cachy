@@ -5,7 +5,6 @@ binds {
     Mod+Alt+Delete hotkey-overlay-title="Cycle Display Profile" { spawn "dms" "ipc" "outputs" "cycleProfile"; }
     Mod+D hotkey-overlay-title="Application Launcher" { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
     Mod+I hotkey-overlay-title="Idle Inhibit: Toggle" { spawn "dms" "ipc" "call" "inhibit" "toggle"; }
-    Mod+N hotkey-overlay-title="Notepad" { spawn "dms" "ipc" "call" "notepad" "toggle"; }
     Mod+Print { spawn "sh" "-c" "dms screenshot scroll"; }
     Mod+W hotkey-overlay-title="wallpaperCarousel" { spawn "sh" "-c" "dms ipc wallpaperCarousel toggle"; }
     Print hotkey-overlay-title="Screenshot: Region" { spawn "dms" "screenshot"; }
@@ -71,8 +70,7 @@ binds {
     Mod+V { toggle-window-floating; }
     Mod+Delete { power-off-monitors; }
     Mod+E { spawn "nautilus"; }
-    Mod+M { spawn "emacsclient" "-a=" "-c"; }
+    Mod+N { spawn "xdg-terminal-exec" "nvim"; }
     Mod+Return hotkey-overlay-title="Open Terminal" { spawn "kitty"; }
-    Mod+Shift+M { spawn "emacs"; }
     Mod+Tab repeat=false { toggle-overview; }
 }
