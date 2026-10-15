@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+HELP="This script will restart the bluetooth service, forcing the bluetooth adapter to power down completely.
+Your bluetooth headset should be turned off before running this command, otherwise it can fail."
+
+function restart_bluetooth() {
+  sudo rfkill block bluetooth
+  sudo systemctl restart bluetooth
+  sudo rfkill unblock bluetooth
+}
+
+case $1 in
+-h | --help)
+  echo "$HELP"
+  ;;
+*)
+  restart_bluetooth
+  ;;
+esac
