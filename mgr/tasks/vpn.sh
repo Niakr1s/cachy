@@ -4,20 +4,46 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../lib/helpers.sh"
 
-pkg_install amneziawg-tools amneziawg-dkms
+configure_amneziawg() {
+  pkg_install amneziawg-tools amneziawg-dkms
 
-SRC="$HOME/sync/wg0.conf"
-DST="/etc/amnezia/amneziawg/wg0.conf"
+  SRC="$HOME/sync/wg0.conf"
+  DST="/etc/amnezia/amneziawg/wg0.conf"
 
-if [ ! -e "$SRC" ]; then
+  if [ ! -e "$SRC" ]; then
     echo "Error: $SRC does not exist. Generate it at https://warp-generation.github.io/ and rerun this." >&2
     exit 1
-fi
+  fi
 
-log_info "Creating a symlink from $SRC to $DST"
-sudo ln -sf "$SRC" "$DST"
+  log_info "Creating a symlink from $SRC to $DST"
+  sudo ln -sf "$SRC" "$DST"
 
-log_info "Enabling the service..."
-sudo systemctl enable --now awg-quick@wg0.service
+  sudo systemctl daemon-reload
 
-echo "$USER ALL=(ALL) NOPASSWD: /bin/systemctl start awg-quick@wg0.service, /bin/systemctl stop awg-quick@wg0.service, /bin/systemctl status awg-quick@wg0.service, /bin/systemctl is-active awg-quick@wg0.service" | sudo tee /etc/sudoers.d/amneziawg > /dev/null && sudo chmod 0440 /etc/sudoers.d/amneziawg
+  add_sudoers_systemctl "awg-quick@wg0.service"
+}
+
+configure_xray_knife() {
+  sudo tee /etc/systemd/system/xray-knife.service >/dev/null <<'EOF'
+[Unit]
+Description=Xray Knife Proxy System
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/home/user/scripts/xray-knife-tun.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+  sudo systemctl daemon-reload
+
+  add_sudoers_systemctl "xray-knife.service"
+}
+
+configure_amneziawg
+configure_xray_knife

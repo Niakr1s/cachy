@@ -41,15 +41,32 @@ aur_install() {
 }
 
 # Install a Go package via go install
+#
+# Each entry is "<pkg>". To add flags for a specific package, append
+# "| <args>" after it (e.g. "@latest|--tags a,b,c"); those args apply only
+# to that one package's `go install`.
 go_install() {
     command_exists go || {
         pkg_install go
     }
 
     local pkgs=("$@")
-    for pkg in "${pkgs[@]}"; do
-        log_info "Installing Go package: $pkg"
-        go install "$pkg"
+    local entry pkg extra=()
+    for entry in "${pkgs[@]}"; do
+        if [[ "$entry" == *"|"* ]]; then
+            pkg="${entry%%|*}"
+            read -ra extra <<< "${entry#*|}"
+        else
+            pkg="$entry"
+        fi
+
+        if (( ${#extra[@]} )); then
+            log_info "Installing Go package: $pkg (flags: ${extra[*]})"
+            go install "${extra[@]}" "$pkg"
+        else
+            log_info "Installing Go package: $pkg"
+            go install "$pkg"
+        fi
     done
 }
 
@@ -81,4 +98,19 @@ am_install() {
             am -i "$pkg"
         fi
     done
+}
+
+add_sudoers_systemctl() {
+    local service="${1:?Usage: add_sudoers_systemctl <service-name>}"
+    local sudoers_file="/etc/sudoers.d/${service//[@.]/_}"
+    local cmds=(start stop restart status is-active)
+    local rule="${USER} ALL=(ALL) NOPASSWD:"
+    local first=1
+    for c in "${cmds[@]}"; do
+        if [ $first -eq 1 ]; then first=0; else rule+=","; fi
+        rule+=" /bin/systemctl ${c} ${service}"
+    done
+
+    echo "$rule" | sudo visudo -c -f - >/dev/null || { echo "invalid rule" >&2; return 1; }
+    echo "$rule" | sudo install -m 0440 -o root -g root /dev/stdin "$sudoers_file"
 }

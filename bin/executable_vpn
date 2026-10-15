@@ -33,7 +33,7 @@ EOF
 get_status() {
     if systemctl is-active --quiet "$WG_SERVICE"; then
         echo "wg"
-    elif systemctl --user is-active --quiet "$XRAY_SERVICE"; then
+    elif systemctl is-active --quiet "$XRAY_SERVICE"; then
         echo "xray"
     else
         echo "off"
@@ -75,9 +75,9 @@ status_full() {
             fi
             ;;
         xray)
-            echo "=== $XRAY_SERVICE (user) ==="
-            if systemctl --user list-unit-files --no-legend "$XRAY_SERVICE" 2>/dev/null | grep -q .; then
-                systemctl --user status -l "$XRAY_SERVICE" --no-pager || true
+            echo "=== $XRAY_SERVICE (system) ==="
+            if systemctl list-unit-files --no-legend "$XRAY_SERVICE" 2>/dev/null | grep -q .; then
+                systemctl status -l "$XRAY_SERVICE" --no-pager || true
             else
                 echo "unit not found"
             fi
@@ -89,7 +89,7 @@ wait_inactive() {
     local scope="$1" svc="$2" i
     for i in $(seq 1 30); do
         if [[ "$scope" == "user" ]]; then
-            systemctl --user is-active --quiet "$svc" || return 0
+            systemctl is-active --quiet "$svc" || return 0
         else
             systemctl is-active --quiet "$svc" || return 0
         fi
@@ -105,8 +105,8 @@ stop_wg() {
 }
 
 stop_xray() {
-    systemctl --user stop "$XRAY_SERVICE" 2>/dev/null || true
-    wait_inactive user "$XRAY_SERVICE" || true
+    sudo systemctl stop "$XRAY_SERVICE" 2>/dev/null || true
+    wait_inactive system "$XRAY_SERVICE" || true
 }
 
 do_off() {
@@ -117,14 +117,14 @@ do_off() {
 do_wg() {
     stop_xray
     sudo systemctl start "$WG_SERVICE"
-    if systemctl --user is-active --quiet "$XRAY_SERVICE"; then
+    if systemctl is-active --quiet "$XRAY_SERVICE"; then
         stop_xray
     fi
 }
 
 do_xray() {
     stop_wg
-    systemctl --user start "$XRAY_SERVICE"
+    sudo systemctl start "$XRAY_SERVICE"
     if systemctl is-active --quiet "$WG_SERVICE"; then
         stop_wg
     fi
