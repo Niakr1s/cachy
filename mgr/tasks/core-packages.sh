@@ -51,6 +51,7 @@ APT_PKGS=(
   hyperfine
   lazygit
   xdg-terminal-exec
+  cairo
 
   # pdf stuff
   ghostscript poppler poppler-data
@@ -59,11 +60,13 @@ APT_PKGS=(
   unarchiver zip unzip unrar lz4 7zip
 
   # libs
+  gtk4-layer-shell
   # needed for joystickwake
   python-pyudev
   python-dbus-fast
   python-xlib
   python-huggingface-hub
+  python-pywayland
   fuse2
 
   # lsp
