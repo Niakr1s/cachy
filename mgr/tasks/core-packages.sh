@@ -102,6 +102,7 @@ APT_PKGS=(
   cmake ninja
   uv
   go
+  rust
   nodejs npm deno
   cargo lldb
   ruby tk ruby-stdlib
