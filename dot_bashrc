@@ -10,17 +10,20 @@ alias grep='grep --color=auto'
 PS1='[\u@\h \W]\$ '
 
 PATH_ADDITIONS=(
-    "$HOME/.local/bin"
-    "$HOME/bin"
-    "$HOME/node_modules/.bin"
-    "$HOME/go/bin"
-    "$HOME/.cargo/bin"
-    "$HOME/.asdf/shims"
-    "$HOME/.local/share/chezmoi/mgr"
-    "$HOME/.local/share/chezmoi/mgr/tools"
-    "$HOME/.config/emacs/bin"
+  "$HOME/.local/bin"
+  "$HOME/bin"
+  "$HOME/node_modules/.bin"
+  "$HOME/go/bin"
+  "$HOME/.cargo/bin"
+  "$HOME/.asdf/shims"
+  "$HOME/.local/share/chezmoi/mgr"
+  "$HOME/.local/share/chezmoi/mgr/tools"
+  "$HOME/.config/emacs/bin"
 )
-export PATH="$PATH:$(IFS=:; echo "${PATH_ADDITIONS[*]}")"
+export PATH="$PATH:$(
+  IFS=:
+  echo "${PATH_ADDITIONS[*]}"
+)"
 
 export EDITOR="nvim"
 export VISUAL="nvim"
@@ -32,29 +35,32 @@ export HISTCONTROL=ignoreboth
 export HISTORY_IGNORE="(\&|[bf]g|c|clear|history|exit|q|pwd|* --help)"
 
 # Use custom `less` colors for `man` pages.
-export LESS_TERMCAP_md="$(tput bold 2> /dev/null; tput setaf 2 2> /dev/null)"
-export LESS_TERMCAP_me="$(tput sgr0 2> /dev/null)"
+export LESS_TERMCAP_md="$(
+  tput bold 2>/dev/null
+  tput setaf 2 2>/dev/null
+)"
+export LESS_TERMCAP_me="$(tput sgr0 2>/dev/null)"
 
 # Make new shells get the history lines from all previous
 # shells instead of the default "last window closed" history.
 export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 
 function y() {
-    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-    command yazi "$@" --cwd-file="$tmp"
-    IFS= read -r -d '' cwd < "$tmp"
-    [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
-    command rm -f -- "$tmp"
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  command yazi "$@" --cwd-file="$tmp"
+  IFS= read -r -d '' cwd <"$tmp"
+  [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+  command rm -f -- "$tmp"
 }
 
 function myip() {
-    echo "$(curl -s 2ip.io) (2ip.io)"
-    echo "$(curl -s ifconfig.me) (ifconfig.me)"
+  echo "$(curl -s 2ip.io) (2ip.io)"
+  echo "$(curl -s ifconfig.me) (ifconfig.me)"
 }
 
 # ALIASES
-alias make="make -j`nproc`"
-alias ninja="ninja -j`nproc`"
+alias make="make -j$(nproc)"
+alias ninja="ninja -j$(nproc)"
 alias n="ninja"
 alias c="clear"
 alias pacfix="sudo rm /var/lib/pacman/db.lck"
@@ -92,10 +98,10 @@ alias gc="git commit"
 
 # Eza
 ezaCmd() {
-    eza --group-directories-first --icons --follow-symlinks "$@"
+  eza --group-directories-first --icons --follow-symlinks "$@"
 }
 ezaCmdTotal() {
-    ezaCmd --total-size "$@"
+  ezaCmd --total-size "$@"
 }
 alias l="ezaCmd -a"
 alias ll="ezaCmd -l"
@@ -115,12 +121,12 @@ export FZF_ALT_C_OPTS="--preview 'tree -C {}' --walker-skip .git,node_modules,ta
 
 # Mount
 luksMountUmount() {
-    local uuid="$1"
-    local label="$2"
-    local mountDir="$HOME/drives/$label"
+  local uuid="$1"
+  local label="$2"
+  local mountDir="$HOME/drives/$label"
 
-
-    eval "$(cat <<EOF
+  eval "$(
+    cat <<EOF
 ${label}() {
   sudo mkdir -p "${mountDir}"
   sudo cryptsetup luksOpen /dev/disk/by-uuid/${uuid} "${label}"
@@ -143,8 +149,8 @@ alias backup-etc="sudo borg create --progress $HOME/drives/hdd1/borg/etc::{now} 
 alias backup-home="sudo borg create --progress $HOME/drives/hdd1/borg/home::{now} $HOME --exclude '$HOME/.config/rpcs3/dev_hdd0/game/*' --exclude '$HOME/drives'"
 
 proxy-shell() {
-    local p="http://127.0.0.1:9999"
-    echo "On: $p"
-    http_proxy="$p" https_proxy="$p" HTTP_PROXY="$p" HTTPS_PROXY="$p" $SHELL
-    echo "Off: $p"
+  local p="http://127.0.0.1:9999"
+  echo "On: $p"
+  http_proxy="$p" https_proxy="$p" HTTP_PROXY="$p" HTTPS_PROXY="$p" $SHELL
+  echo "Off: $p"
 }
