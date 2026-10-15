@@ -50,6 +50,7 @@ APT_PKGS=(
   texlive-bin # otfinfo
   hyperfine
   lazygit
+  xdg-terminal-exec
 
   # pdf stuff
   ghostscript poppler poppler-data
