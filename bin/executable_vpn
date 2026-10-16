@@ -17,6 +17,7 @@ Usage: vpn <command>
 Commands:
    cycle                   Cycle state: off → wg → proxy → tun → off
    cycle-backwards         Reverse the cycle: tun → proxy → wg → off → tun
+   restart                 Restart the currently active VPN mode's service
    off                     Stop all VPN services
    on <mode>               Start one VPN mode and stop the others:
        wg      WireGuard (awg-quick@wg0)
@@ -191,6 +192,16 @@ do_on() {
     esac
 }
 
+# Restart the currently active mode's underlying service only.
+do_restart() {
+    case "$(get_status)" in
+        wg)      sudo systemctl restart "$WG_SERVICE" ;;
+        proxy)   systemctl --user restart "$XRAY_USER_SERVICE" ;;
+        tun)     sudo systemctl restart "$XRAY_SERVICE" ;;
+        off)     echo "vpn: no active VPN mode to restart" >&2; exit 0 ;;
+    esac
+}
+
 # List available VPN modes with short descriptions (for `vpn on <mode>`).
 do_list() {
     printf '%-5s  -  %s\n' \
@@ -239,6 +250,9 @@ case "${1:-}" in
         ;;
     cycle-backwards)
         do_cycle_backward
+        ;;
+    restart)
+        do_restart
         ;;
     off)
         do_off
