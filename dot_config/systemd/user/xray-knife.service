@@ -5,7 +5,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/home/user/go/bin/xray-knife proxy system --insecure
+ExecStart=/home/user/go/bin/xray-knife proxy system --insecure --rotate 0
 Restart=on-failure
 RestartSec=5
 
