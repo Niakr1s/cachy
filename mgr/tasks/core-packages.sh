@@ -151,6 +151,7 @@ APT_PKGS=(
   squeekboard
   gthumb
   zeal
+  opencode
 
   # browsers
   firefox
