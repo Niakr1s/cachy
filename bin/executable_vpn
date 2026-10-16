@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-WG_SERVICE="awg-quick@wg0.service"
-XRAY_SERVICE="xray-knife.service"
+WG_SERVICE="awg-quick@wg0.service"          # system: WireGuard tunnel
+XRAY_USER_SERVICE="xray-knife.service"      # user (systemctl --user): local proxy
+XRAY_SERVICE="xray-knife.service"           # system: full Xray‑knife tunnel
 
 # ANSI colors
 RED=$'\033[31m'
@@ -14,17 +15,18 @@ usage() {
 Usage: vpn <command>
 
 Commands:
-  cycle                     Cycle state: off → wg → xray → off
-  off                       Stop all VPN services
-  wg                        Switch to WireGuard (awg-quick@wg0)
-  xray                      Switch to Xray (xray-knife)
-  status                    Print current state: off | wg | xray
-  status --full             Print full systemctl status of active service
-  status -s                 Print symbol: ⓞ | ⓦ | ⓧ
-                            (alias: --symbol)
-  status -cs                Print colored symbol (red=off, green=on)
-                            (alias: --coloredsymbol)
-  help, -h, --help          Show this help
+   cycle                   Cycle state: off → wg → proxy → tun → off
+   off                     Stop all VPN services
+   wg                      Switch to WireGuard (awg-quick@wg0)
+   proxy                   Switch to user‑level Xray proxy (systemctl --user)
+   tun                     Switch to system Xray tunnel (xray-knife, sudo)
+   status                  Print current state: off | wg | proxy | tun
+   status --full           Print full systemctl status of active service
+   status -s               Print symbol: ⓞ | ⓦ | ⓟ | ⓣ
+                           (alias: --symbol)
+   status -cs              Print colored symbol (red=off, green=on)
+                           (alias: --coloredsymbol)
+   help, -h, --help        Show this help
 
 Run with no arguments to print this usage.
 EOF
@@ -33,8 +35,10 @@ EOF
 get_status() {
     if systemctl is-active --quiet "$WG_SERVICE"; then
         echo "wg"
+    elif systemctl --user is-active --quiet "$XRAY_USER_SERVICE"; then
+        echo "proxy"
     elif systemctl is-active --quiet "$XRAY_SERVICE"; then
-        echo "xray"
+        echo "tun"
     else
         echo "off"
     fi
@@ -42,9 +46,10 @@ get_status() {
 
 get_symbol() {
     case "$(get_status)" in
-        off)  echo "ⓞ" ;;   # U+24DE
-        wg)   echo "ⓦ" ;;   # U+24E6
-        xray) echo "ⓧ" ;;   # U+24E7
+        off)     echo "ⓞ" ;;  # U+24DE
+        wg)      echo "ⓦ" ;;  # U+24E6
+        proxy)   echo "ⓟ" ;;  # U+24DF (proxied user proxy)
+        tun)     echo "ⓣ" ;;  # U+24E3 (tunnel)
     esac
 }
 
@@ -52,8 +57,8 @@ get_symbol_colored() {
     local s
     s="$(get_status)"
     case "$s" in
-        off)     printf '%s%s%s\n' "$RED"   "$(get_symbol)" "$RESET" ;;
-        wg|xray) printf '%s%s%s\n' "$GREEN" "$(get_symbol)" "$RESET" ;;
+        off)          printf '%s%s%s\n' "$RED"   "$(get_symbol)" "$RESET" ;;
+        wg|proxy|tun) printf '%s%s%s\n' "$GREEN" "$(get_symbol)" "$RESET" ;;
     esac
 }
 
@@ -74,8 +79,16 @@ status_full() {
                 echo "unit not found"
             fi
             ;;
-        xray)
-            echo "=== $XRAY_SERVICE (system) ==="
+        proxy)
+            echo "=== $XRAY_USER_SERVICE (user proxy) ==="
+            if systemctl --user list-unit-files --no-legend "$XRAY_USER_SERVICE" 2>/dev/null | grep -q .; then
+                systemctl --user status -l "$XRAY_USER_SERVICE" --no-pager || true
+            else
+                echo "unit not found"
+            fi
+            ;;
+        tun)
+            echo "=== $XRAY_SERVICE (system tunnel) ==="
             if systemctl list-unit-files --no-legend "$XRAY_SERVICE" 2>/dev/null | grep -q .; then
                 systemctl status -l "$XRAY_SERVICE" --no-pager || true
             else
@@ -89,7 +102,7 @@ wait_inactive() {
     local scope="$1" svc="$2" i
     for i in $(seq 1 30); do
         if [[ "$scope" == "user" ]]; then
-            systemctl is-active --quiet "$svc" || return 0
+            systemctl --user is-active --quiet "$svc" || return 0
         else
             systemctl is-active --quiet "$svc" || return 0
         fi
@@ -104,37 +117,47 @@ stop_wg() {
     wait_inactive system "$WG_SERVICE" || true
 }
 
+stop_xray_user() {
+    systemctl --user stop "$XRAY_USER_SERVICE" 2>/dev/null || true
+    wait_inactive user "$XRAY_USER_SERVICE" || true
+}
+
 stop_xray() {
     sudo systemctl stop "$XRAY_SERVICE" 2>/dev/null || true
     wait_inactive system "$XRAY_SERVICE" || true
 }
 
+# Each state is exclusive: it stops the other two services before starting its own.
 do_off() {
     stop_wg
+    stop_xray_user
     stop_xray
 }
 
 do_wg() {
+    stop_xray_user
     stop_xray
     sudo systemctl start "$WG_SERVICE"
-    if systemctl is-active --quiet "$XRAY_SERVICE"; then
-        stop_xray
-    fi
 }
 
-do_xray() {
+do_proxy() {
     stop_wg
+    stop_xray
+    systemctl --user start "$XRAY_USER_SERVICE"
+}
+
+do_tun() {
+    stop_wg
+    stop_xray_user
     sudo systemctl start "$XRAY_SERVICE"
-    if systemctl is-active --quiet "$WG_SERVICE"; then
-        stop_wg
-    fi
 }
 
 do_cycle() {
     case "$(get_status)" in
-        off)  do_wg ;;
-        wg)   do_xray ;;
-        xray) do_off ;;
+        off)     do_wg ;;
+        wg)      do_proxy ;;
+        proxy)   do_tun ;;
+        tun)     do_off ;;
     esac
 }
 
@@ -182,8 +205,11 @@ case "${1:-}" in
     wg)
         do_wg
         ;;
-    xray)
-        do_xray
+    proxy)
+        do_proxy
+        ;;
+    tun)
+        do_tun
         ;;
     status)
         status_cmd "$@"
