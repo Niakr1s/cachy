@@ -18,9 +18,10 @@ Commands:
    cycle                   Cycle state: off → wg → proxy → tun → off
    cycle-backwards         Reverse the cycle: tun → proxy → wg → off → tun
    off                     Stop all VPN services
-   wg                      Switch to WireGuard (awg-quick@wg0)
-   proxy                   Switch to user‑level Xray proxy (systemctl --user)
-   tun                     Switch to system Xray tunnel (xray-knife, sudo)
+   on <mode>               Start one VPN mode and stop the others:
+       wg      WireGuard (awg-quick@wg0)
+       proxy   user‑level Xray proxy (systemctl --user)
+       tun     system Xray tunnel (xray-knife, sudo)
    status                  Print current state: off | wg | proxy | tun
    status --full           Print full systemctl status of active service
    status -s               Print symbol: ⓞ | ⓦ | ⓟ | ⓣ
@@ -172,6 +173,23 @@ do_cycle_backward() {
     esac
 }
 
+# Start exactly one VPN mode and stop the others.
+do_on() {
+    local mode="${1:-}"
+    case "$mode" in
+        off)     do_off ;;
+        wg)      do_wg ;;
+        proxy)   do_proxy ;;
+        tun)     do_tun ;;
+        *)
+            echo "vpn: unknown mode '$mode' for 'on'" >&2
+            echo "usage: vpn on <wg|proxy|tun>" >&2
+            usage >&2
+            exit 1
+            ;;
+    esac
+}
+
 status_cmd() {
     local symbol=0 colored_symbol=0 full=0
     shift  # drop "status"
@@ -216,14 +234,8 @@ case "${1:-}" in
     off)
         do_off
         ;;
-    wg)
-        do_wg
-        ;;
-    proxy)
-        do_proxy
-        ;;
-    tun)
-        do_tun
+    on)
+        do_on "${2:-}"
         ;;
     status)
         status_cmd "$@"
