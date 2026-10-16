@@ -16,6 +16,7 @@ Usage: vpn <command>
 
 Commands:
    cycle                   Cycle state: off → wg → proxy → tun → off
+   cycle-backwards         Reverse the cycle: tun → proxy → wg → off → tun
    off                     Stop all VPN services
    wg                      Switch to WireGuard (awg-quick@wg0)
    proxy                   Switch to user‑level Xray proxy (systemctl --user)
@@ -161,6 +162,16 @@ do_cycle() {
     esac
 }
 
+# Move to the predecessor state in the forward loop (reverse of do_cycle).
+do_cycle_backward() {
+    case "$(get_status)" in
+        off)     do_tun ;;
+        wg)      do_off ;;
+        proxy)   do_wg ;;
+        tun)     do_proxy ;;
+    esac
+}
+
 status_cmd() {
     local symbol=0 colored_symbol=0 full=0
     shift  # drop "status"
@@ -198,6 +209,9 @@ case "${1:-}" in
         ;;
     cycle)
         do_cycle
+        ;;
+    cycle-backwards)
+        do_cycle_backward
         ;;
     off)
         do_off
