@@ -9,4 +9,4 @@ if [ -z "${IFACE:-}" ]; then
     exit 1
 fi
 
-$USER_HOME/go/bin/xray-knife proxy tun --db $USER_HOME/.xray-knife/xray-knife.db --bind "$IFACE" --tun-deadman 0
+$USER_HOME/go/bin/xray-knife proxy tun --db $USER_HOME/.xray-knife/xray-knife.db --bind "$IFACE" --tun-deadman 0 --rotate 0
