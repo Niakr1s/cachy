@@ -150,6 +150,7 @@ APT_PKGS=(
   kdenlive
   squeekboard
   gthumb
+  zeal
 
   # browsers
   firefox
