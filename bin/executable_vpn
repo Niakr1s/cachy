@@ -20,8 +20,9 @@ Commands:
    off                     Stop all VPN services
    on <mode>               Start one VPN mode and stop the others:
        wg      WireGuard (awg-quick@wg0)
-       proxy   user‑level Xray proxy (systemctl --user)
+       proxy   user‑level Xray proxy (xray-knife, --user)
        tun     system Xray tunnel (xray-knife, sudo)
+   list                    List available VPN modes with descriptions
    status                  Print current state: off | wg | proxy | tun
    status --full           Print full systemctl status of active service
    status -s               Print symbol: ⓞ | ⓦ | ⓟ | ⓣ
@@ -190,6 +191,14 @@ do_on() {
     esac
 }
 
+# List available VPN modes with short descriptions (for `vpn on <mode>`).
+do_list() {
+    printf '%-5s  -  %s\n' \
+        wg      'WireGuard tunnel (awg-quick@wg0)' \
+        proxy   'Local Xray proxy (xray-knife, --user)' \
+        tun     'System Xray tunnel (xray-knife, sudo)'
+}
+
 status_cmd() {
     local symbol=0 colored_symbol=0 full=0
     shift  # drop "status"
@@ -236,6 +245,9 @@ case "${1:-}" in
         ;;
     on)
         do_on "${2:-}"
+        ;;
+    list)
+        do_list
         ;;
     status)
         status_cmd "$@"
