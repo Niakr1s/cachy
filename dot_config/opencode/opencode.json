@@ -1,0 +1,28 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "llama.cpp-local": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "llama.cpp (Local)",
+      "options": {
+        "baseURL": "http://localhost:9931/v1",
+        "apiKey": "sk-no-key-required"
+      },
+      "models": {
+        "Qwen3.8-27B": {
+          "name": "Qwen3.8-27B"
+        },
+        "Qwen3.6-35B-A3B": {
+          "name": "Qwen3.6-35B-A3B"
+        },
+        "Gemma4-26B-A4B": {
+          "name": "Gemma4-26B-A4B"
+        },
+        "Gemma4-E4B": {
+          "name": "Gemma4-E4B"
+        }
+      }
+    }
+  },
+  "model": "llama.cpp-local/Qwen3.6-35B-A3B"
+}

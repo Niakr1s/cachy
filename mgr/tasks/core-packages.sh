@@ -52,6 +52,7 @@ APT_PKGS=(
   lazygit
   xdg-terminal-exec
   cairo
+  bubblewrap
 
   # pdf stuff
   ghostscript poppler poppler-data
