@@ -7,7 +7,7 @@
         "displayText": "",
         "displayCommand": "~/bin/vpn status -cs",
         "clickCommand": "~/bin/vpn cycle",
-        "middleClickCommand": "",
+        "middleClickCommand": "~/bin/vpn restart",
         "rightClickCommand": "~/bin/vpn cycle-backwards",
         "updateInterval": 1,
         "showIcon": false,
