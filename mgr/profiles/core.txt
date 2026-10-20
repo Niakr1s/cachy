@@ -7,4 +7,3 @@ core-packages
 groups
 caddy
 podman
-doom-emacs
