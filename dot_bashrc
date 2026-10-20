@@ -77,17 +77,56 @@ alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
 alias ff="fastfetch"
 alias se="sudoedit"
 
-# Opencode
-alias opencode="bwrap \
-  --ro-bind / / \
-  --dev /dev \
-  --proc /proc \
-  --bind "$PWD" "$PWD" \
-  --bind "$HOME/.local/share/opencode" "$HOME/.local/share/opencode" \
-  --bind "$HOME/.config/opencode" "$HOME/.config/opencode" \
-  --bind "$HOME/.cache/opencode" "$HOME/.cache/opencode" \
-  --bind "$HOME/.local/state/opencode" "$HOME/.local/state/opencode" \
-opencode --standalone"
+# Opencode (see https://github.com/didvc/opencode-bwrap/blob/master/opencode-bwrap)
+function opencode() {
+  local WORKSPACES=(
+    "$PWD"
+    "$HOME/org"
+    "$HOME/.local/share/chezmoi"
+  )
+
+  local WORKSPACE_BINDS=()
+
+  echo "workspaces:"
+  for ws in "${WORKSPACES[@]}"; do
+    if [ -d "$ws" ] && [ "$(realpath -e -- "$ws")" != "$(realpath -e -- "$HOME")" ]; then
+      WORKSPACE_BINDS+=(--bind "$ws" "$ws")
+      echo "- $ws"
+    fi
+  done
+
+  bwrap \
+    --unshare-all \
+    --share-net \
+    --unshare-pid \
+    --die-with-parent \
+    --proc /proc \
+    --dev /dev \
+    --tmpfs /tmp \
+    --tmpfs /run \
+    --ro-bind /usr /usr \
+    --symlink usr/lib /lib \
+    --symlink usr/lib64 /lib64 \
+    --symlink usr/bin /bin \
+    --symlink usr/sbin /sbin \
+    --ro-bind /etc /etc \
+    --dir "$HOME" \
+    --setenv HOME "$HOME" \
+    --setenv PATH "$PATH" \
+    --setenv TMPDIR /tmp \
+    --bind "$HOME/.local/share/opencode" "$HOME/.local/share/opencode" \
+    --bind "$HOME/.config/opencode" "$HOME/.config/opencode" \
+    --bind "$HOME/.cache/opencode" "$HOME/.cache/opencode" \
+    --bind "$HOME/.local/state/opencode" "$HOME/.local/state/opencode" \
+    --ro-bind-try "$HOME/.ssh/known_hosts" "$HOME/.ssh/known_hosts" \
+    --ro-bind-try "$HOME/.ssh/config" "$HOME/.ssh/config" \
+    --ro-bind-try "$HOME/.ssh/authorized_keys" "$HOME/.ssh/authorized_keys" \
+    --ro-bind-try "$HOME/.ssh/id_rsa.pub" "$HOME/.ssh/id_rsa.pub" \
+    --ro-bind-try "$HOME/.ssh/id_ed25519.pub" "$HOME/.ssh/id_ed25519.pub" \
+    --ro-bind-try "$HOME/.ssh/id_ecdsa.pub" "$HOME/.ssh/id_ecdsa.pub" \
+    "${WORKSPACE_BINDS[@]}" \
+    opencode --standalone "$@"
+}
 
 # Chezmoi
 alias cz="chezmoi"
