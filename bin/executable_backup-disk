@@ -12,8 +12,8 @@ Params:
 
 # the common dir, so the disks will be children of it
 # for example "/data/hdd1", "/data/ssd" etc
-from_mnt_dir="/data"
-to_mnt_dir="/data"
+from_mnt_dir="$HOME/drives"
+to_mnt_dir="$HOME/drives"
 wait_seconds="5"
 
 while [[ -n "$1" ]]; do
