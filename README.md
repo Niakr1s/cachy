@@ -20,6 +20,7 @@ Useful params:
 - clearcpuid=514 # for gaming
 - split_lock_detect=off # for gaming
 - usbcore.quirks="057e:2009:ik" # fixes my gamepad
+- usb-storage.quirks=0bc2:ab80:u # fixes my 20TB hdd (probably)
 
 ## Enabling TRIM on Encrypted (LUKS) Devices
 
