@@ -1,0 +1,12 @@
+[Unit]
+Description=Hide X11 tray icons and bridge to SNI
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/go/bin/xtrayhide
+ExecStartPre=/bin/sh -c 'until busctl --user list | grep -q StatusNotifierWatcher; do sleep 0.5; done'
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=graphical-session.target
