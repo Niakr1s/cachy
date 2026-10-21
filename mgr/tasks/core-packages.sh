@@ -164,6 +164,7 @@ APT_PKGS=(
   occt
 
   # games stuff
+  proton-cachyos-native
   mangohud
   gamescope
   gamemode
