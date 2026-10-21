@@ -36,7 +36,7 @@ BindsTo=nvidia-persistenced.service
 
 [Service]
 DynamicUser=yes
-ExecStart=/usr/local/bin/nvidia-pstated
+ExecStart=/usr/local/bin/nvidia-pstated -i 1
 Restart=on-failure
 RestartSec=1s
 
