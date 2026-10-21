@@ -6,6 +6,7 @@ binds {
     Mod+D hotkey-overlay-title="Application Launcher" { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
     Mod+I hotkey-overlay-title="Idle Inhibit: Toggle" { spawn "dms" "ipc" "call" "inhibit" "toggle"; }
     Mod+Print { spawn "sh" "-c" "dms screenshot scroll"; }
+    Mod+V hotkey-overlay-title="Clipboard: Toggle" { spawn "dms" "ipc" "call" "clipboard" "toggle"; }
     Mod+W hotkey-overlay-title="wallpaperCarousel" { spawn "sh" "-c" "dms ipc wallpaperCarousel toggle"; }
     Print hotkey-overlay-title="Screenshot: Region" { spawn "dms" "screenshot"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "decrement" "3"; }
@@ -43,6 +44,7 @@ binds {
     Mod+Shift+K { focus-workspace-up; }
     Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
     Mod+WheelScrollUp cooldown-ms=150 { focus-workspace-up; }
+    Mod+A { toggle-window-floating; }
     Mod+BracketLeft { focus-monitor-left; }
     Mod+BracketRight { focus-monitor-right; }
     Mod+Comma { consume-or-expel-window-left; }
@@ -67,7 +69,6 @@ binds {
     Mod+Shift+F { fullscreen-window; }
     Mod+Shift+Minus { set-window-height "-10%"; }
     Mod+Shift+R { switch-preset-window-height; }
-    Mod+V { toggle-window-floating; }
     Mod+Delete { power-off-monitors; }
     Mod+E { spawn "nautilus"; }
     Mod+N { spawn "xdg-terminal-exec" "nvim"; }
