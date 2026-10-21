@@ -9,4 +9,4 @@ system:
   prefix_command: dlss-swapper
   single_cpu: false
 wine:
-  version: system
+  version: proton-cachyos-native
