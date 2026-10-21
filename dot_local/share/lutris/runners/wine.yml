@@ -1,8 +1,11 @@
 system:
   env:
+    ENABLE_VKBASALT: '1'
     UMU_RUNTIME_UPDATE: '0'
   gamemode: false
-  gpu: card0
+  gpu: ''
+  limit_cpu_count: '16'
   mangohud: true
+  single_cpu: false
 wine:
-  version: Proton - Experimental
+  version: system
