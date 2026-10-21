@@ -9,7 +9,6 @@ APT_PKGS=(
 AUR_PKGS=(
   vkbasalt
   lib32-vkbasalt
-  reshade-shaders-git
 )
 
 AM_PKGS=(
