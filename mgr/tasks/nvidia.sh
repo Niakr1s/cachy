@@ -19,7 +19,7 @@ pkg_install "${APT_PKGS[@]}"
 install_nvidia_pstated() {
   local url="https://github.com/sasha0552/nvidia-pstated/releases/download/v1.0.9/nvidia-pstated"
   local dest="/usr/local/bin/nvidia-pstated"
-  local service_file="/etc/systemd/system/nvidia-pstated.service"
+  local service_file="/etc/systemd/system/nvidia-pstated@.service"
 
   log_info "Downloading nvidia-pstated..."
   sudo curl -L "$url" -o "$dest"
@@ -36,7 +36,7 @@ BindsTo=nvidia-persistenced.service
 
 [Service]
 DynamicUser=yes
-ExecStart=/usr/local/bin/nvidia-pstated -i 1
+ExecStart=/usr/local/bin/nvidia-pstated -i %i
 Restart=on-failure
 RestartSec=1s
 
@@ -47,14 +47,7 @@ EOF
   log_info "Reloading systemd manager configuration..."
   sudo systemctl daemon-reload
 
-  log_info "Enabling nvidia-pstated service to start on boot..."
-  sudo systemctl enable nvidia-pstated.service
-
-  log_info "Starting nvidia-pstated service now..."
-  sudo systemctl start nvidia-pstated.service
-
-  log_info "Installation complete! Checking service status..."
-  sudo systemctl status nvidia-pstated.service
+  log_info "To enable nvidia-pstated service run: 'sudo systemctl enable --now nvidia-pstated@1.service', where the number after @1 corresponds for needed GPU number from nvidia-smi"
 }
 
 install_nvidia_pstated
