@@ -178,7 +178,8 @@ APT_PKGS=(
 
 AUR_PKGS=(
   lisgd iio-niri
-  portprotonqt
+  vkbasalt
+  lib32-vkbasalt
 )
 
 GO_PKGS=(
