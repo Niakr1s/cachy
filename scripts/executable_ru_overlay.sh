@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import glob
 import json
 import os
 import socket
@@ -33,7 +34,10 @@ class TrueWaylandOverlay:
         # lets us react to monitors being connected/disconnected after startup
         # (e.g. a second screen plugged in later) without restarting the app.
         self.id_to_win = {}
-        self.show_overlay = False
+        self.ru_active = False
+        # Caps-Lock indicator state, driven by the sysfs poller below.
+        self.caps_lock = False
+        self.running = True
 
     def apply_transparent_theme(self):
         """Injects a CSS provider to strip out standard GTK window backgrounds."""
@@ -67,8 +71,10 @@ class TrueWaylandOverlay:
 
         label = Gtk.Label()
         label.set_halign(Gtk.Align.CENTER)
-        # Bold high-contrast red label
-        label.set_markup('<span font="Bold 22" foreground="#FF5555">RU</span>')
+        # Renders the current indicator: an optional ⇪ (Caps Lock) immediately
+        # to the left of "RU" when the Russian layout is active. The window stays
+        # visible on every monitor, so Caps Lock is shown regardless of layout.
+        label.set_markup(self._indicator_markup())
         win.set_child(label)
 
         win.present()
@@ -86,8 +92,98 @@ class TrueWaylandOverlay:
         # screen plugged in after startup) by re-checking periodically.
         threading.Thread(target=self._poll_monitors, daemon=True).start()
 
-        # Watch for keyboard layout switches so we can show/hide the overlay.
+        # Watch for keyboard layout switches so "RU" appears when Russian is active.
         threading.Thread(target=self.listen_to_niri, daemon=True).start()
+
+        # Initialise Caps Lock from sysfs so the indicator reflects reality
+        # immediately, even if caps was already latched before startup.
+        self.caps_lock = self._current_caps_lock()
+
+        # Track Caps Lock state via its LED brightness attribute in sysfs
+        # (see _watch_caps_lock()). Niri mirrors the physical LED to match the
+        # latched lock, so no event parsing is needed.
+        threading.Thread(target=self._watch_caps_lock, daemon=True).start()
+
+    # --- Caps Lock indicator (sysfs) ------------------------------------------
+    _LED_PATTERNS = (
+        "/sys/class/leds/*capslock*/brightness",
+        "/sys/class/leds/*caps*/brightness",
+        "/sys/class/input/input*/capslock/brightness",
+    )
+
+    def _current_caps_lock(self):
+        """Return True/False for current Caps Lock state, or None if unsupported.
+
+        Niri drives the keyboard's LED to mirror the latched Caps Lock state; we
+        read that sysfs brightness file directly, so detection needs no event
+        parsing and correctly reports caps even when it was already on at launch.
+        """
+        for pattern in self._LED_PATTERNS:
+            matches = glob.glob(pattern)
+            if not matches:
+                continue
+            try:
+                with open(matches[0], "r") as f:
+                    value = f.read().strip()
+            except OSError:
+                continue
+            if value in ("0", "1"):
+                return value == "1"
+        # No readable LED attribute available on this system.
+        return None
+
+    def _watch_caps_lock(self):
+        """Background thread: poll sysfs for Caps Lock and update the label.
+
+        Polls periodically; any change flips self.caps_lock, refreshed on the GTK
+        main thread via GLib.idle_add. Runs forever until self.running is cleared.
+        Returns early (leaving the RU overlay fully working) if no LED attribute
+        is readable on this system.
+        """
+        state = self._current_caps_lock()
+        if state is None:
+            print("ru_overlay: no Caps Lock sysfs support; indicator disabled",
+                  file=sys.stderr)
+            return
+        self.caps_lock = state
+        while self.running:
+            try:
+                new_state = self._current_caps_lock()
+            except Exception as e:
+                print(f"ru_overlay: caps lock poll error: {e}", file=sys.stderr)
+                new_state = None
+            if new_state is not None and new_state != self.caps_lock:
+                self.caps_lock = new_state
+                GLib.idle_add(self._refresh_all_labels)
+            time.sleep(0.25)
+
+    def _indicator_markup(self):
+        """Compose the bottom indicator label from current state.
+
+        Returns an optional ⇪ (Caps Lock) immediately to the left of "RU", e.g.:
+          EN, caps off  -> ""   EN, caps on -> "⇪"
+          RU, caps off  -> "RU"          RU, caps on -> "⇪ RU"
+
+        Uses no leading/trailing spacing when a part is empty.
+        """
+        parts = []
+        if self.caps_lock:
+            parts.append('<span font="Bold 22" foreground="#DDDDDD">\u21e4</span>')
+        if self.ru_active:
+            parts.append('<span font="Bold 22" foreground="#FF5555">RU</span>')
+        return ' '.join(parts)
+
+    def _refresh_all_labels(self):
+        """Re-render the indicator label on every overlay window.
+
+        Runs on the GTK main thread (called directly from window creation or via
+        GLib.idle_add when Caps Lock / layout state changes). Does not touch
+        visibility, so it is safe to call even between monitor reconciliations.
+        """
+        for win in list(self.id_to_win.values()):
+            child = win.get_child()
+            if getattr(child, "set_markup", None) is not None:
+                child.set_markup(self._indicator_markup())
 
     def _reconcile_monitors(self):
         """Make sure there is exactly one overlay window per visible Gdk monitor.
@@ -133,15 +229,8 @@ class TrueWaylandOverlay:
                 mid: w for mid, w in self.id_to_win.items() if mid in current_ids
             }
 
-        # Keep visibility in sync with the last known keyboard state.
-        self._apply_visibility()
-
-    def _apply_visibility(self):
-        for win in list(self.id_to_win.values()):
-            if self.show_overlay:
-                win.present()
-            else:
-                win.hide()
+        # Windows stay visible on every monitor; the label itself composes the
+        # RU text only while self.ru_active is set (see _indicator_markup()).
 
     def _poll_monitors(self):
         while True:
@@ -155,9 +244,10 @@ class TrueWaylandOverlay:
             surface.set_input_region(empty_region)
 
     def update_visibility(self, idx):
-        self.show_overlay = (idx == 1)
-        # Applies to every existing overlay window and any windows created later.
-        GLib.idle_add(self._apply_visibility)
+        # Only the "RU" text depends on this; the Caps Lock indicator stays
+        # visible on every monitor regardless of active layout.
+        self.ru_active = (idx == 1)
+        GLib.idle_add(self._refresh_all_labels)
 
     def listen_to_niri(self):
         socket_path = os.environ.get("NIRI_SOCKET")
