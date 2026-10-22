@@ -104,6 +104,11 @@ class TrueWaylandOverlay:
         # latched lock, so no event parsing is needed.
         threading.Thread(target=self._watch_caps_lock, daemon=True).start()
 
+        # Keep the overlay composited promptly on an empty surface (see
+        # _keep_alive_redraw). This bounds any toggle lag to about one interval with
+        # no visual change, without relying on Niri to repaint a transparent region.
+        GLib.timeout_add(500, self._keep_alive_redraw)
+
     # --- Caps Lock indicator (sysfs) ------------------------------------------
     _LED_PATTERNS = (
         "/sys/class/leds/*capslock*/brightness",
@@ -179,11 +184,31 @@ class TrueWaylandOverlay:
         Runs on the GTK main thread (called directly from window creation or via
         GLib.idle_add when Caps Lock / layout state changes). Does not touch
         visibility, so it is safe to call even between monitor reconciliations.
+
+        After changing markup we force an explicit redraw with queue_draw(). This
+        matters because GTK4 only auto-queues a draw when the new label has
+        visible content; turning caps OFF or switching back to EN shrinks the
+        label toward empty, which skips the automatic frame request, so the
+        compositor wouldn't repaint until some unrelated event fires seconds
+        later. queue_draw() removes that stall and makes updates immediate.
         """
         for win in list(self.id_to_win.values()):
             child = win.get_child()
             if getattr(child, "set_markup", None) is not None:
-                child.set_markup(self._indicator_markup())
+                try:
+                    child.set_markup(self._indicator_markup())
+                except Exception as e:
+                    print(f"ru_overlay: set_markup error: {e}", file=sys.stderr)
+                # Force the compositor to composite this change right away,
+                # instead of relying on set_markup's auto-queue (which skips when
+                # the label becomes empty). This GTK4 build exposes queue_draw as
+                # a direct method.
+                try:
+                    child.queue_draw()
+                except AttributeError:
+                    Gtk.Widget.__draw_funcs__.queue_draw(child)
+                except Exception as e:
+                    print(f"ru_overlay: queue_draw error: {e}", file=sys.stderr)
 
     def _reconcile_monitors(self):
         """Make sure there is exactly one overlay window per visible Gdk monitor.
@@ -231,6 +256,26 @@ class TrueWaylandOverlay:
 
         # Windows stay visible on every monitor; the label itself composes the
         # RU text only while self.ru_active is set (see _indicator_markup()).
+
+    def _keep_alive_redraw(self):
+        """Periodically force a redraw so Niri keeps compositing this overlay.
+
+        A fully-transparent / empty overlay has no opaque "damage" to ask for, so
+        wlroots/Niri only repaints it when some *other* window activity forces a
+        frame -- which is what delayed caps toggles by 3-11 s (or, after pinning the
+        size, left them not clearing at all). Redrawing on a short cadence guarantees
+        our surface gets composited promptly (within one interval) with no visible
+        change to its content. Runs in the GTK main loop via GLib.timeout_add;
+        returns True to keep repeating until the app quits.
+        """
+        for win in list(self.id_to_win.values()):
+            try:
+                child = win.get_child()
+                if getattr(child, "queue_draw", None) is not None:
+                    child.queue_draw()
+            except Exception as e:
+                print(f"ru_overlay: keep_alive draw error: {e}", file=sys.stderr)
+        return True
 
     def _poll_monitors(self):
         while True:
