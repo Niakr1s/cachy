@@ -127,17 +127,37 @@ class TrueWaylandOverlay:
             print(f"Failed to enumerate monitors: {e}", file=sys.stderr)
             return
 
-        current_ids = {id(m) for m in current}
+        # Key windows by a stable per-screen identity. Gdk hands out fresh Python
+        # objects on every enumeration, so id(m) churns right after a hotplug and
+        # would make this close + recreate the same screen's window each tick (a
+        # 3 s flicker). We key by connector name plus logical size instead -- stable
+        # for the same physical display in a given mode, unique per screen. This
+        # build's GdkWaylandMonitor has neither get_uuid nor get_logical_rect.
+        current_ids = set()
+
+        def _mon_id(mon):
+            # Stable per-screen identity from connector name plus logical size.
+            try:
+                desc = (mon.get_description() or '').strip().lower()
+            except Exception:
+                desc = ''
+            rect = mon.get_geometry()
+            w, h = (rect.width, rect.height) if rect else (0, 0)
+            return f"{desc}-{w}x{h}".lower()
+
+        current_ids = {_mon_id(m) for m in current}
 
         # Add a window for every monitor that doesn't have one yet.
         for mon in current:
-            if id(mon) not in self.id_to_win:
-                try:
-                    win = self.create_indicator_window(self.app, mon)
-                except Exception as e:
-                    print(f"Failed to create overlay window: {e}", file=sys.stderr)
-                    continue
-                self.id_to_win[id(mon)] = win
+            mid = _mon_id(mon)
+            if not mid or mid in self.id_to_win:
+                continue  # unknown identity / same physical screen -- reuse existing window
+            try:
+                win = self.create_indicator_window(self.app, mon)
+            except Exception as e:
+                print(f"Failed to create overlay window: {e}", file=sys.stderr)
+                continue
+            self.id_to_win[mid] = win
 
         # Close windows whose monitor has gone away. Skip removal before we have
         # created at least one window, so a transient empty result doesn't destroy
