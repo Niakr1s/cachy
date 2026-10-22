@@ -173,7 +173,7 @@ class TrueWaylandOverlay:
         """
         parts = []
         if self.caps_lock:
-            parts.append('<span font="Bold 22" foreground="#DDDDDD">\u21e4</span>')
+            parts.append('<span font="Bold 22" foreground="#DDDDDD">\u21ea</span>')
         if self.ru_active:
             parts.append('<span font="Bold 22" foreground="#FF5555">RU</span>')
         return ' '.join(parts)
