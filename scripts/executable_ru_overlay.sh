@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 
-import glob
 import json
-import os
-import socket
+import subprocess
 import sys
 import threading
-import time
 import warnings
+
+# evdev gives us real keyboard events (Caps Lock LED) without sleeping/polling.
+import evdev
+from evdev import ecodes
 from ctypes import CDLL
+
 import gi
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -26,6 +28,7 @@ gi.require_version('Gtk4LayerShell', '1.0')
 from gi.repository import Gtk, Gdk, GLib, Gtk4LayerShell as LayerShell
 import cairo
 
+
 class TrueWaylandOverlay:
     def __init__(self):
         self.app = Gtk.Application(application_id="ru-layout-overlay")
@@ -34,10 +37,12 @@ class TrueWaylandOverlay:
         # lets us react to monitors being connected/disconnected after startup
         # (e.g. a second screen plugged in later) without restarting the app.
         self.id_to_win = {}
+        # Which layout is currently active ("RU" only, per _indicator_markup()).
         self.ru_active = False
-        # Caps-Lock indicator state, driven by the sysfs poller below.
+        # Caps-Lock state, driven by the evdev event loop below.
         self.caps_lock = False
-        self.running = True
+        # Substrings that identify a Russian layout (case-insensitive).
+        self.russian_markers = ("rus", "рус")
 
     def apply_transparent_theme(self):
         """Injects a CSS provider to strip out standard GTK window backgrounds."""
@@ -71,7 +76,7 @@ class TrueWaylandOverlay:
 
         label = Gtk.Label()
         label.set_halign(Gtk.Align.CENTER)
-        # Renders the current indicator: an optional ⇪ (Caps Lock) immediately
+        # Renders the current indicator: an optional ⇧ (Caps Lock) immediately
         # to the left of "RU" when the Russian layout is active. The window stays
         # visible on every monitor, so Caps Lock is shown regardless of layout.
         label.set_markup(self._indicator_markup())
@@ -88,127 +93,19 @@ class TrueWaylandOverlay:
         # Create one overlay window per currently visible monitor right away.
         self._reconcile_monitors()
 
-        # React to monitors being connected/disconnected at runtime (e.g. a second
-        # screen plugged in after startup) by re-checking periodically.
-        threading.Thread(target=self._poll_monitors, daemon=True).start()
+        # Detect Caps Lock via real keyboard LED events (blocks on fd, no polling).
+        threading.Thread(target=self.watch_caps_lock, daemon=True).start()
 
-        # Watch for keyboard layout switches so "RU" appears when Russian is active.
-        threading.Thread(target=self.listen_to_niri, daemon=True).start()
+        # Subscribe to Niri's IPC stream for layout switches (also reflects the
+        # current layout at startup).
+        threading.Thread(target=self.watch_niri_layouts, daemon=True).start()
 
-        # Initialise Caps Lock from sysfs so the indicator reflects reality
-        # immediately, even if caps was already latched before startup.
-        self.caps_lock = self._current_caps_lock()
-
-        # Track Caps Lock state via its LED brightness attribute in sysfs
-        # (see _watch_caps_lock()). Niri mirrors the physical LED to match the
-        # latched lock, so no event parsing is needed.
-        threading.Thread(target=self._watch_caps_lock, daemon=True).start()
-
-        # Keep the overlay composited promptly on an empty surface (see
-        # _keep_alive_redraw). This bounds any toggle lag to about one interval with
-        # no visual change, without relying on Niri to repaint a transparent region.
-        GLib.timeout_add(500, self._keep_alive_redraw)
-
-    # --- Caps Lock indicator (sysfs) ------------------------------------------
-    _LED_PATTERNS = (
-        "/sys/class/leds/*capslock*/brightness",
-        "/sys/class/leds/*caps*/brightness",
-        "/sys/class/input/input*/capslock/brightness",
-    )
-
-    def _current_caps_lock(self):
-        """Return True/False for current Caps Lock state, or None if unsupported.
-
-        Niri drives the keyboard's LED to mirror the latched Caps Lock state; we
-        read that sysfs brightness file directly, so detection needs no event
-        parsing and correctly reports caps even when it was already on at launch.
-        """
-        for pattern in self._LED_PATTERNS:
-            matches = glob.glob(pattern)
-            if not matches:
-                continue
-            try:
-                with open(matches[0], "r") as f:
-                    value = f.read().strip()
-            except OSError:
-                continue
-            if value in ("0", "1"):
-                return value == "1"
-        # No readable LED attribute available on this system.
-        return None
-
-    def _watch_caps_lock(self):
-        """Background thread: poll sysfs for Caps Lock and update the label.
-
-        Polls periodically; any change flips self.caps_lock, refreshed on the GTK
-        main thread via GLib.idle_add. Runs forever until self.running is cleared.
-        Returns early (leaving the RU overlay fully working) if no LED attribute
-        is readable on this system.
-        """
-        state = self._current_caps_lock()
-        if state is None:
-            print("ru_overlay: no Caps Lock sysfs support; indicator disabled",
-                  file=sys.stderr)
-            return
-        self.caps_lock = state
-        while self.running:
-            try:
-                new_state = self._current_caps_lock()
-            except Exception as e:
-                print(f"ru_overlay: caps lock poll error: {e}", file=sys.stderr)
-                new_state = None
-            if new_state is not None and new_state != self.caps_lock:
-                self.caps_lock = new_state
-                GLib.idle_add(self._refresh_all_labels)
-            time.sleep(0.25)
-
-    def _indicator_markup(self):
-        """Compose the bottom indicator label from current state.
-
-        Returns an optional ⇪ (Caps Lock) immediately to the left of "RU", e.g.:
-          EN, caps off  -> ""   EN, caps on -> "⇪"
-          RU, caps off  -> "RU"          RU, caps on -> "⇪ RU"
-
-        Uses no leading/trailing spacing when a part is empty.
-        """
-        parts = []
-        if self.caps_lock:
-            parts.append('<span font="Bold 22" foreground="#DDDDDD">\u21ea</span>')
-        if self.ru_active:
-            parts.append('<span font="Bold 22" foreground="#FF5555">RU</span>')
-        return ' '.join(parts)
-
-    def _refresh_all_labels(self):
-        """Re-render the indicator label on every overlay window.
-
-        Runs on the GTK main thread (called directly from window creation or via
-        GLib.idle_add when Caps Lock / layout state changes). Does not touch
-        visibility, so it is safe to call even between monitor reconciliations.
-
-        After changing markup we force an explicit redraw with queue_draw(). This
-        matters because GTK4 only auto-queues a draw when the new label has
-        visible content; turning caps OFF or switching back to EN shrinks the
-        label toward empty, which skips the automatic frame request, so the
-        compositor wouldn't repaint until some unrelated event fires seconds
-        later. queue_draw() removes that stall and makes updates immediate.
-        """
-        for win in list(self.id_to_win.values()):
-            child = win.get_child()
-            if getattr(child, "set_markup", None) is not None:
-                try:
-                    child.set_markup(self._indicator_markup())
-                except Exception as e:
-                    print(f"ru_overlay: set_markup error: {e}", file=sys.stderr)
-                # Force the compositor to composite this change right away,
-                # instead of relying on set_markup's auto-queue (which skips when
-                # the label becomes empty). This GTK4 build exposes queue_draw as
-                # a direct method.
-                try:
-                    child.queue_draw()
-                except AttributeError:
-                    Gtk.Widget.__draw_funcs__.queue_draw(child)
-                except Exception as e:
-                    print(f"ru_overlay: queue_draw error: {e}", file=sys.stderr)
+        # Keep the overlay composited even when it is fully empty ("", i.e. EN +
+        # caps off): wlroots/Niri will not repaint a transparent surface until some
+        # other activity forces a frame. Redrawing on a short cadence guarantees
+        # both states go "off" promptly (within ~one interval) with no visible
+        # change to content. Runs in the GTK main loop; returns True to repeat.
+        GLib.timeout_add(_REDRAW_INTERVAL_MS, self._keep_alive_redraw)
 
     def _reconcile_monitors(self):
         """Make sure there is exactly one overlay window per visible Gdk monitor.
@@ -260,27 +157,23 @@ class TrueWaylandOverlay:
     def _keep_alive_redraw(self):
         """Periodically force a redraw so Niri keeps compositing this overlay.
 
-        A fully-transparent / empty overlay has no opaque "damage" to ask for, so
-        wlroots/Niri only repaints it when some *other* window activity forces a
-        frame -- which is what delayed caps toggles by 3-11 s (or, after pinning the
-        size, left them not clearing at all). Redrawing on a short cadence guarantees
-        our surface gets composited promptly (within one interval) with no visible
-        change to its content. Runs in the GTK main loop via GLib.timeout_add;
-        returns True to keep repeating until the app quits.
+        Needed because a fully-transparent / empty overlay has no opaque
+        "damage" to ask for, so the compositor would otherwise only repaint it
+        when some unrelated window forces a frame -- which caused caps toggles to
+        be delayed 3-11 s (or get stuck). Redrawing on a short cadence bounds any
+        toggle lag to about one interval with no visible change to content.
+        Runs in the GTK main loop via GLib.timeout_add; returns True to repeat.
         """
         for win in list(self.id_to_win.values()):
             try:
                 child = win.get_child()
                 if getattr(child, "queue_draw", None) is not None:
                     child.queue_draw()
+                else:
+                    Gtk.Widget.__draw_funcs__.queue_draw(child)
             except Exception as e:
                 print(f"ru_overlay: keep_alive draw error: {e}", file=sys.stderr)
         return True
-
-    def _poll_monitors(self):
-        while True:
-            GLib.idle_add(self._reconcile_monitors)
-            time.sleep(3)
 
     def make_click_through(self, widget):
         surface = widget.get_native().get_surface()
@@ -288,44 +181,156 @@ class TrueWaylandOverlay:
             empty_region = cairo.Region()
             surface.set_input_region(empty_region)
 
-    def update_visibility(self, idx):
+    # --- Indicator label ------------------------------------------------------
+
+    def _indicator_markup(self):
+        """Compose the bottom indicator label from current state.
+
+        Returns an optional ⇧ (Caps Lock) immediately to the left of "RU", e.g.:
+          EN, caps off  -> ""   EN, caps on -> "⇧"
+          RU, caps off  -> "RU"          RU, caps on -> "⇧ RU"
+
+        Uses no leading/trailing spacing when a part is empty.
+        """
+        parts = []
+        if self.caps_lock:
+            parts.append('<span font="Bold 22" foreground="#DDDDDD">\u21ea</span>')
+        if self.ru_active:
+            parts.append('<span font="Bold 22" foreground="#FF5555">RU</span>')
+        return ' '.join(parts)
+
+    def _refresh_all_labels(self):
+        """Re-render the indicator label on every overlay window.
+
+        Runs on the GTK main thread (called directly from window creation or via
+        GLib.idle_add when Caps Lock / layout state changes). Does not touch
+        visibility, so it is safe to call even between monitor reconciliations.
+        """
+        for win in list(self.id_to_win.values()):
+            child = win.get_child()
+            if getattr(child, "set_markup", None) is not None:
+                try:
+                    child.set_markup(self._indicator_markup())
+                except Exception as e:
+                    print(f"ru_overlay: set_markup error: {e}", file=sys.stderr)
+
+    def _looks_russian(self, name):
+        n = (name or "").lower().strip()
+        return any(tok in n for tok in self.russian_markers)
+
+    def _set_active_layout(self, name):
         # Only the "RU" text depends on this; the Caps Lock indicator stays
-        # visible on every monitor regardless of active layout.
-        self.ru_active = (idx == 1)
+        # visible on every monitor regardless of active layout. Any change to
+        # markup is reflected immediately (and empty state within one redraw).
+        self.ru_active = self._looks_russian(name)
         GLib.idle_add(self._refresh_all_labels)
 
-    def listen_to_niri(self):
-        socket_path = os.environ.get("NIRI_SOCKET")
-        if not socket_path:
+    def _resolve_layout_name(self, idx):
+        if not isinstance(idx, int):
+            return None
+        try:
+            out = subprocess.run(
+                ["niri", "msg", "--json", "keyboard-layouts"],
+                capture_output=True, text=True, check=True, timeout=2,
+            )
+            data = json.loads(out.stdout)
+            names = data.get("names")
+            if isinstance(names, list) and 0 <= idx < len(names):
+                return names[idx]
+        except Exception as e:
+            print(f"ru_overlay: layout name lookup failed: {e}", file=sys.stderr)
+        return None
+
+    def _apply_current_layout(self):
+        # Reflect the currently active layout at launch (best-effort).
+        try:
+            out = subprocess.run(
+                ["niri", "msg", "--json", "keyboard-layouts"],
+                capture_output=True, text=True, check=True, timeout=2,
+            )
+            data = json.loads(out.stdout)
+        except Exception as e:
+            print(f"ru_overlay: initial layout query failed: {e}", file=sys.stderr)
+            return
+
+        names = data.get("names")
+        idx = (data.get("layout_idx", None)
+               or data.get("current_idx", None)
+               or data.get("default_idx", None))
+        if isinstance(names, list) and isinstance(idx, int) and 0 <= idx < len(names):
+            GLib.idle_add(self._set_active_layout, names[idx])
+
+    def watch_niri_layouts(self):
+        """Background thread: subscribe to Niri's IPC stream for layout switches.
+
+        Starts an `niri msg event-stream` subprocess and yields on each
+        KeyboardLayoutSwitched, translating the idx into a layout name (or using
+        one Niri includes in the payload). Runs until the subprocess ends.
+        """
+        proc = subprocess.Popen(
+            ["niri", "msg", "--json", "event-stream"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+        )
+        self._apply_current_layout()  # reflect reality at launch
+        try:
+            for line in proc.stdout:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    event = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                kl = event.get("KeyboardLayoutSwitched")
+                if isinstance(kl, dict):
+                    idx = kl.get("idx")
+                    name = kl.get("name") or self._resolve_layout_name(idx)
+                    GLib.idle_add(self._set_active_layout, name)
+        except Exception as e:
+            print(f"ru_overlay: niri layout error: {e}", file=sys.stderr)
+        finally:
+            proc.terminate()
+            proc.wait()
+
+    def watch_caps_lock(self):
+        """Background thread: detect Caps Lock via a keyboard LED event loop.
+
+        Finds the first input device that exposes CAPSL, then blocks on its fd
+        with read_loop (no polling / sleep). Each EV_LED/LED_CAPSL flip updates
+        self.caps_lock and repaints on the GTK main thread. Returns early if no
+        suitable device is readable. Requires membership in the `input` group.
+        """
+        dev = None
+        for path in evdev.list_devices():
+            try:
+                cand = evdev.InputDevice(path)
+            except (OSError, PermissionError):
+                continue
+            if ecodes.LED_CAPSL in (cand.capabilities().get(ecodes.EV_LED, []) or []):
+                dev = cand
+                break
+
+        if dev is None:
+            print("ru_overlay: no keyboard with Caps Lock LED found; "
+                  "indicator disabled", file=sys.stderr)
             return
 
         try:
-            s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            s.connect(socket_path)
-            s.sendall(b'"EventStream"\n')
-
-            buffer = ""
-            while True:
-                data = s.recv(4096).decode('utf-8')
-                if not data:
-                    break
-                buffer += data
-                while "\n" in buffer:
-                    line, buffer = buffer.split("\n", 1)
-                    if not line.strip():
-                        continue
-                    try:
-                        event = json.loads(line)
-                        if "KeyboardLayoutSwitched" in event:
-                            idx = event["KeyboardLayoutSwitched"]["idx"]
-                            GLib.idle_add(self.update_visibility, idx)
-                    except json.JSONDecodeError:
-                        continue
+            for event in dev.read_loop():
+                if event.type == ecodes.EV_LED and event.code == ecodes.LED_CAPSL:
+                    state = bool(event.value)
+                    if state != self.caps_lock:
+                        self.caps_lock = state
+                        GLib.idle_add(self._refresh_all_labels)
         except Exception as e:
-            print(f"Niri IPC connection error: {e}", file=sys.stderr)
+            print(f"ru_overlay: caps event loop error: {e}", file=sys.stderr)
 
     def run(self):
         self.app.run(None)
+
+
+_REDRAW_INTERVAL_MS = 500  # keep-alive redraw cadence (see _keep_alive_redraw)
+
 
 if __name__ == '__main__':
     app = TrueWaylandOverlay()
