@@ -64,6 +64,7 @@ APT_PKGS=(
   gtk4-layer-shell
   # needed for joystickwake
   python-pyudev
+  python-evdev
   python-dbus-fast
   python-xlib
   python-huggingface-hub
