@@ -102,6 +102,7 @@ function opencode() {
     --die-with-parent \
     --proc /proc \
     --dev /dev \
+    --dev-bind-try /dev/input /dev/input \
     --tmpfs /tmp \
     --tmpfs /run \
     --ro-bind /usr /usr \
