@@ -4,6 +4,7 @@ import json
 import subprocess
 import sys
 import threading
+import time
 import warnings
 
 # evdev gives us real keyboard events (Caps Lock LED) without sleeping/polling.
@@ -100,6 +101,10 @@ class TrueWaylandOverlay:
         # current layout at startup).
         threading.Thread(target=self.watch_niri_layouts, daemon=True).start()
 
+        # Re-check monitors periodically so a screen plugged in *after* launch picks
+        # up its own overlay window (e.g. going from 1 to 2 monitors at runtime).
+        threading.Thread(target=self._poll_monitors, daemon=True).start()
+
         # Establish presence immediately: if nothing is active, hide the windows we
         # just created. See sync_state().
         GLib.idle_add(self.sync_state)
@@ -150,6 +155,18 @@ class TrueWaylandOverlay:
 
         # Windows are shown/hidden on demand (see sync_state()); presence is not
         # tied to layout -- only the "RU" text content is.
+
+    def _poll_monitors(self):
+        """Background thread: periodically re-run the monitor reconciliation.
+
+        Lets a monitor that is connected *after* startup (or disconnected) be
+        picked up without restarting the app, so the overlay appears on every
+        currently-visible screen -- including when you go from 1 to 2 monitors at
+        runtime. Runs forever until the process exits.
+        """
+        while True:
+            GLib.idle_add(self._reconcile_monitors)
+            time.sleep(3)
 
     def make_click_through(self, widget):
         surface = widget.get_native().get_surface()
