@@ -100,12 +100,9 @@ class TrueWaylandOverlay:
         # current layout at startup).
         threading.Thread(target=self.watch_niri_layouts, daemon=True).start()
 
-        # Keep the overlay composited even when it is fully empty ("", i.e. EN +
-        # caps off): wlroots/Niri will not repaint a transparent surface until some
-        # other activity forces a frame. Redrawing on a short cadence guarantees
-        # both states go "off" promptly (within ~one interval) with no visible
-        # change to content. Runs in the GTK main loop; returns True to repeat.
-        GLib.timeout_add(_REDRAW_INTERVAL_MS, self._keep_alive_redraw)
+        # Establish presence immediately: if nothing is active, hide the windows we
+        # just created. See sync_state().
+        GLib.idle_add(self.sync_state)
 
     def _reconcile_monitors(self):
         """Make sure there is exactly one overlay window per visible Gdk monitor.
@@ -151,29 +148,8 @@ class TrueWaylandOverlay:
                 mid: w for mid, w in self.id_to_win.items() if mid in current_ids
             }
 
-        # Windows stay visible on every monitor; the label itself composes the
-        # RU text only while self.ru_active is set (see _indicator_markup()).
-
-    def _keep_alive_redraw(self):
-        """Periodically force a redraw so Niri keeps compositing this overlay.
-
-        Needed because a fully-transparent / empty overlay has no opaque
-        "damage" to ask for, so the compositor would otherwise only repaint it
-        when some unrelated window forces a frame -- which caused caps toggles to
-        be delayed 3-11 s (or get stuck). Redrawing on a short cadence bounds any
-        toggle lag to about one interval with no visible change to content.
-        Runs in the GTK main loop via GLib.timeout_add; returns True to repeat.
-        """
-        for win in list(self.id_to_win.values()):
-            try:
-                child = win.get_child()
-                if getattr(child, "queue_draw", None) is not None:
-                    child.queue_draw()
-                else:
-                    Gtk.Widget.__draw_funcs__.queue_draw(child)
-            except Exception as e:
-                print(f"ru_overlay: keep_alive draw error: {e}", file=sys.stderr)
-        return True
+        # Windows are shown/hidden on demand (see sync_state()); presence is not
+        # tied to layout -- only the "RU" text content is.
 
     def make_click_through(self, widget):
         surface = widget.get_native().get_surface()
@@ -199,13 +175,16 @@ class TrueWaylandOverlay:
             parts.append('<span font="Bold 22" foreground="#FF5555">RU</span>')
         return ' '.join(parts)
 
-    def _refresh_all_labels(self):
-        """Re-render the indicator label on every overlay window.
+    def sync_state(self):
+        """Set markup and visibility on every window at once.
 
-        Runs on the GTK main thread (called directly from window creation or via
-        GLib.idle_add when Caps Lock / layout state changes). Does not touch
-        visibility, so it is safe to call even between monitor reconciliations.
+        Runs on the GTK main thread after a Caps Lock or layout change (and once
+        at launch). If both conditions are off there is nothing to show, so we
+        *hide* the windows entirely -- this avoids the compositor refusing to
+        paint a transparent surface, which would otherwise leave stale content.
+        Otherwise we set the markup and re-present the windows immediately.
         """
+        any_active = self.ru_active or self.caps_lock
         for win in list(self.id_to_win.values()):
             child = win.get_child()
             if getattr(child, "set_markup", None) is not None:
@@ -213,17 +192,20 @@ class TrueWaylandOverlay:
                     child.set_markup(self._indicator_markup())
                 except Exception as e:
                     print(f"ru_overlay: set_markup error: {e}", file=sys.stderr)
+            if any_active:
+                win.present()
+            else:
+                win.hide()
 
     def _looks_russian(self, name):
         n = (name or "").lower().strip()
         return any(tok in n for tok in self.russian_markers)
 
     def _set_active_layout(self, name):
-        # Only the "RU" text depends on this; the Caps Lock indicator stays
-        # visible on every monitor regardless of active layout. Any change to
-        # markup is reflected immediately (and empty state within one redraw).
+        # Only the "RU" text depends on this; presence of anything else (caps) is
+        # independent. Reflect both markup and visibility immediately via sync.
         self.ru_active = self._looks_russian(name)
-        GLib.idle_add(self._refresh_all_labels)
+        GLib.idle_add(self.sync_state)
 
     def _resolve_layout_name(self, idx):
         if not isinstance(idx, int):
@@ -297,8 +279,9 @@ class TrueWaylandOverlay:
 
         Finds the first input device that exposes CAPSL, then blocks on its fd
         with read_loop (no polling / sleep). Each EV_LED/LED_CAPSL flip updates
-        self.caps_lock and repaints on the GTK main thread. Returns early if no
-        suitable device is readable. Requires membership in the `input` group.
+        self.caps_lock and repaints (and re-present/hides) on the GTK main thread.
+        Returns early if no suitable device is readable. Requires membership in
+        the `input` group.
         """
         dev = None
         for path in evdev.list_devices():
@@ -321,15 +304,12 @@ class TrueWaylandOverlay:
                     state = bool(event.value)
                     if state != self.caps_lock:
                         self.caps_lock = state
-                        GLib.idle_add(self._refresh_all_labels)
+                        GLib.idle_add(self.sync_state)
         except Exception as e:
             print(f"ru_overlay: caps event loop error: {e}", file=sys.stderr)
 
     def run(self):
         self.app.run(None)
-
-
-_REDRAW_INTERVAL_MS = 500  # keep-alive redraw cadence (see _keep_alive_redraw)
 
 
 if __name__ == '__main__':
