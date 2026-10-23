@@ -153,6 +153,7 @@ APT_PKGS=(
   gthumb
   zeal
   opencode
+  emacs
 
   # browsers
   firefox
