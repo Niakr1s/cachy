@@ -83,6 +83,7 @@ binds {
     Mod+Up { focus-window-up; }
     Mod+Delete { power-off-monitors; }
     Mod+E { spawn "nautilus"; }
+    Mod+M { spawn "emacs"; }
     Mod+N { spawn "xdg-terminal-exec" "nvim"; }
     Mod+Return hotkey-overlay-title="Open Terminal" { spawn "kitty"; }
     Mod+Tab repeat=false { toggle-overview; }

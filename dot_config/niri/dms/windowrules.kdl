@@ -65,9 +65,3 @@ window-rule {
     match app-id="^steam_proton$"
     open-floating false
 }
-
-// @id=wr_1791397596969869604 @name=Emacs
-window-rule {
-    match app-id="^Emacs"
-    open-on-workspace "emacs"
-}
