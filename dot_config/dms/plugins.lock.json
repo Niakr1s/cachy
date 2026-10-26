@@ -8,7 +8,7 @@
     "dankActions": {
       "repo": "https://github.com/AvengeMedia/dms-plugins",
       "path": "DankActions",
-      "commit": "6fc7f25bfb24f93b6488fb8a36ed67b5f242abdb"
+      "commit": "69fcc477de31616807bfc6ee03492319cc7e2484"
     },
     "dockerManager": {
       "repo": "https://github.com/LuckShiba/DmsDockerManager",
