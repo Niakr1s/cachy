@@ -81,8 +81,8 @@ alias se="sudoedit"
 function opencode() {
   local WORKSPACES=(
     "$PWD"
-    "$HOME/org"
-    "$HOME/.local/share/chezmoi"
+    # "$HOME/org"
+    # "$HOME/.local/share/chezmoi"
   )
 
   local WORKSPACE_BINDS=()

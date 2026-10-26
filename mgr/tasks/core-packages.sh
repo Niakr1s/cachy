@@ -53,6 +53,7 @@ APT_PKGS=(
   xdg-terminal-exec
   cairo
   bubblewrap
+  tmux
 
   # pdf stuff
   ghostscript poppler poppler-data
