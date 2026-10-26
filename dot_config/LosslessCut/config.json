@@ -1,6 +1,6 @@
 {
 	"version": 2,
-	"lastAppVersion": "3.69.0",
+	"lastAppVersion": "3.70.1",
 	"captureFormat": "jpeg",
 	"enableCustomOutDir": false,
 	"recentCustomOutDirs": [],
@@ -46,8 +46,8 @@
 	"windowBounds": {
 		"x": 0,
 		"y": 0,
-		"width": 2558,
-		"height": 1398,
+		"width": 2552,
+		"height": 1396,
 		"isMaximized": false
 	},
 	"enableAutoHtml5ify": true,
@@ -295,7 +295,8 @@
 		"cleanupAfterExport": false
 	},
 	"allowMultipleInstances": false,
-	"darkMode": true,
+	"theme": "dark",
+	"videoFit": "contain",
 	"preferStrongColors": false,
 	"outputFileNameMinZeroPadding": 1,
 	"cutFromAdjustmentFrames": 0,
