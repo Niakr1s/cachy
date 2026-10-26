@@ -233,6 +233,10 @@
       ],
       "rightWidgets": [
         {
+          "id": "battery",
+          "enabled": true
+        },
+        {
           "id": "network_speed_monitor",
           "enabled": true
         },
@@ -240,10 +244,6 @@
         "memUsage",
         {
           "id": "clipboard",
-          "enabled": false
-        },
-        {
-          "id": "battery",
           "enabled": false
         },
         "systemTray",
