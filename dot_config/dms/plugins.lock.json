@@ -3,11 +3,7 @@
   "plugins": {
     "calculator": {
       "repo": "https://github.com/rochacbruno/DankCalculator",
-      "commit": "1db5865419a40a33171a475855a59e0b8bf7187f"
-    },
-    "commandRunner": {
-      "repo": "https://github.com/devnullvoid/dms-command-runner",
-      "commit": "5c2cab404335ceb96c60cf9e97a9682994209cd4"
+      "commit": "a27b80ad8c3dd42da11af83461674fb362817515"
     },
     "dankActions": {
       "repo": "https://github.com/AvengeMedia/dms-plugins",
@@ -16,11 +12,11 @@
     },
     "dockerManager": {
       "repo": "https://github.com/LuckShiba/DmsDockerManager",
-      "commit": "9e6a01283e169c46eff7a157202b1b8ab48577b1"
+      "commit": "f6f7d94c84510da098980a2bb733137e90f98fd8"
     },
     "emojiLauncher": {
       "repo": "https://github.com/devnullvoid/dms-emoji-launcher",
-      "commit": "8ff394e3ddfcb2fd755ed2e7b4c6f01f3e26e596"
+      "commit": "fc385900e6df292f0a7e5bdda4e3e37169897d7c"
     },
     "volumeMixer": {
       "repo": "https://github.com/cwelsys/dms-volume-mixer",
