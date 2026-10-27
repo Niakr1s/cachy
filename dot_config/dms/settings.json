@@ -877,5 +877,5 @@
     }
   ],
   "lockScreenShowPowerActions": true,
-  "launcherStyle": "island"
+  "launcherStyle": "full"
 }
