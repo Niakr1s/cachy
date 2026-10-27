@@ -47,16 +47,18 @@ APT_PKGS=(
   calc
   trash-cli
   pax-utils   # lddtree
-  texlive-bin # otfinfo
   hyperfine
   lazygit
   xdg-terminal-exec
   cairo
   bubblewrap
   tmux
+  tdf
 
-  # pdf stuff
+  # doc stuff
   ghostscript poppler poppler-data
+  djvulibre libgxps libspectre texlive-bin 
+  tesseract-data-eng # needed by pdf viewers
 
   # archive
   unarchiver zip unzip unrar lz4 7zip
@@ -129,7 +131,7 @@ APT_PKGS=(
   qbittorrent
   nautilus
   sqlitebrowser
-  foliate
+  xreader
   weechat
   l3afpad
   gnome-disk-utility
