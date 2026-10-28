@@ -39,19 +39,7 @@
       "id": "profile_1787766906921_3v94udd",
       "name": "2",
       "outputs": {
-        "DP-4": {
-          "mode": "2560x1440@165.001",
-          "position": {
-            "x": 0,
-            "y": 0
-          },
-          "scale": 1,
-          "transform": "Normal",
-          "vrr": false,
-          "disabled": false,
-          "niri": {}
-        },
-        "HDMI-A-3": {
+        "Xiaomi Corporation Mi Monitor 2920000136510": {
           "mode": "1920x1080@75.002",
           "position": {
             "x": 2581,
@@ -61,7 +49,24 @@
           "transform": "Normal",
           "vrr": false,
           "disabled": false,
-          "niri": {}
+          "niri": {
+            "focusAtStartup": false,
+            "disabled": false
+          }
+        },
+        "GIGA-BYTE TECHNOLOGY CO., LTD. M32QC 24390B004015": {
+          "mode": "2560x1440@165.001",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "scale": 1,
+          "transform": "Normal",
+          "vrr": false,
+          "disabled": false,
+          "niri": {
+            "focusAtStartup": true
+          }
         }
       }
     },
