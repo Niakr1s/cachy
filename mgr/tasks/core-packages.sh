@@ -65,6 +65,8 @@ APT_PKGS=(
 
   # libs
   gtk4-layer-shell
+  gtk-layer-shell
+  libevdev
   # needed for joystickwake
   python-pyudev
   python-evdev
@@ -108,7 +110,8 @@ APT_PKGS=(
   caddy mkcert
 
   # programming
-  cmake ninja
+  cmake ninja make
+  bear # for generating compile_commands.json: bear -- mak
   uv
   go
   rust
