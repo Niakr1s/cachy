@@ -144,7 +144,6 @@ APT_PKGS=(
   strawberry
   kdeconnect
   kid3
-  zed
   strawberry
   mpv
   telegram-desktop
