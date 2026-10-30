@@ -159,6 +159,7 @@ APT_PKGS=(
   gthumb
   zeal
   opencode
+  blanket
 
   # browsers
   firefox
