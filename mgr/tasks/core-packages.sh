@@ -170,7 +170,8 @@ APT_PKGS=(
   occt
 
   # games stuff
-  proton-cachyos-native
+  lutris
+  proton-cachyos-slr wine # either one or another will work
   mangohud
   gamescope
   gamemode
