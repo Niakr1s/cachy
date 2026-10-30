@@ -291,7 +291,7 @@
         },
         {
           "id": "powerMenuButton",
-          "enabled": true
+          "enabled": false
         }
       ],
       "spacing": 0,
