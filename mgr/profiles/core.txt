@@ -2,6 +2,7 @@
 # Other profiles start with "%include core" to pull these in first.
 # (Also runnable on its own: ./mgr core)
 
+locale
 dms-shell
 core-packages
 groups
