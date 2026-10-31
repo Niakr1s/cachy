@@ -3,7 +3,6 @@ system:
     ENABLE_VKBASALT: '1'
     PROTON_LOG: '1'
   gamemode: false
-  gpu: card2
   limit_cpu_count: '16'
   mangohud: true
   prefix_command: dlss-swapper
