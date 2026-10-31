@@ -54,6 +54,7 @@ APT_PKGS=(
   bubblewrap
   tmux
   tdf
+  swappy
 
   # doc stuff
   ghostscript poppler poppler-data
