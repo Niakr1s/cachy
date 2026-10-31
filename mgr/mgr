@@ -20,8 +20,8 @@ list_tasks()    { ls "$TASKS_DIR"    | sed 's/\.sh$//'; }
 
 usage() {
   cat <<EOF
-Usage: $(basename "$0") <profile>           Run all tasks for a machine (profiles/<name>.txt)
-       $(basename "$0") <task> [args...]    Run a single task (tasks/<name>.sh)
+Usage: $(basename "$0") profile <profile>           Run all tasks for a machine (profiles/<name>.txt)
+       $(basename "$0") task <task> [args...]    Run a single task (tasks/<name>.sh)
 
 Profiles:  $(list_profiles | tr '\n' ' ')
 Tasks:     $(list_tasks | tr '\n' ' ')
@@ -76,16 +76,27 @@ run_profile() {
 
 main() {
   local cmd="${1:-help}"
+  shift
   case "$cmd" in
     -h|--help|help) usage ;;
-    *)
-      if [[ -f "$PROFILES_DIR/$cmd.txt" ]]; then
-        run_profile "$cmd"
-      elif [[ -f "$TASKS_DIR/$cmd.sh" ]]; then
-        shift
-        run_task "$cmd" "$@"
+    profile)
+      local profile="$1"
+      shift
+      if [[ -f "$PROFILES_DIR/$profile.txt" ]]; then
+        run_profile "$profile"
       else
-        echo "ERROR: unknown profile or task '$cmd'" >&2
+        echo "ERROR: unknown profile '$profile'" >&2
+        usage >&2
+        exit 1
+      fi
+      ;;
+    task)
+      local task="$1"
+      shift
+      if [[ -f "$TASKS_DIR/$task.sh" ]]; then
+        run_task "$task" "$@"
+      else
+        echo "ERROR: unknown task '$task'" >&2
         usage >&2
         exit 1
       fi
