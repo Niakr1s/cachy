@@ -1,0 +1,3 @@
+[processes]
+default_memory_value = true
+process_command = true
